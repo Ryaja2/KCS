@@ -15,377 +15,276 @@
 
   <!-- ══════ MISSION HEADER ══════ -->
   <header class="mission-header">
-
     <div style="display:flex;align-items:center;gap:6px">
       <div class="mission-badge">
         <div class="badge-hex"><span class="badge-hex-inner">KCS</span></div>
         <div class="badge-text">
           <span class="badge-title">KCS</span>
-          <span class="badge-sub">KERBAL CONTROL SUITE · MISSION OPS</span>
+          <span class="badge-sub">KERBAL CONTROL SUITE · MCC GROUND SUPPORT</span>
         </div>
       </div>
       <div class="status-rack">
-        <div class="status-cell">
-          <div class="status-led on-green blink"></div>
-          <div class="status-label">SYS</div>
-        </div>
-        <div class="status-cell">
-          <div class="status-led on-amber blink" style="animation-delay:0.5s"></div>
-          <div class="status-label">COM</div>
-        </div>
-        <div class="status-cell">
-          <div class="status-led on-green"></div>
-          <div class="status-label">NAV</div>
-        </div>
-        <div class="status-cell">
-          <div class="status-led on-green blink" style="animation-delay:2.1s"></div>
-          <div class="status-label">PWR</div>
-        </div>
+        <div class="status-cell"><div class="status-led on-green blink"></div><div class="status-label">SYS</div></div>
+        <div class="status-cell"><div class="status-led on-amber blink" style="animation-delay:.6s"></div><div class="status-label">COM</div></div>
+        <div class="status-cell"><div class="status-led on-green"></div><div class="status-label">NAV</div></div>
+        <div class="status-cell"><div class="status-led on-green blink" style="animation-delay:2.2s"></div><div class="status-label">PWR</div></div>
       </div>
     </div>
-
     <div class="mission-clock-wrap">
       <div class="clock-label">MISSION ELAPSED TIME</div>
       <div id="mission-clock">T+ 000:00:00:00</div>
     </div>
-
     <nav class="control-panel-nav">
       <button class="ctrl-btn active" data-tab="constellation">Constellation</button>
       <button class="ctrl-btn" data-tab="transfer">Transfer</button>
-      <button class="ctrl-btn" data-tab="deltav">Delta-V</button>
+      <button class="ctrl-btn" data-tab="deltav">Mission ΔV</button>
       <button class="ctrl-btn" data-tab="orbit">Orbit</button>
       <button class="ctrl-btn" data-tab="commnet">CommNet</button>
     </nav>
-
   </header>
 
   <main>
 
-    <!-- ════════════════════════════════
-         TAB: CONSTELLATION
-    ════════════════════════════════ -->
+    <!-- ════════════════ CONSTELLATION ════════════════ -->
     <div class="tab-panel active" id="tab-constellation">
       <div class="tab-heading">RELAY CONSTELLATION PLANNER</div>
       <div class="calc-layout">
 
         <div class="calc-inputs">
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Configuration</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Configuration</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Target Body</div>
-                <select id="con-body"></select>
-              </div>
-              <div class="instrument">
-                <div class="instrument-label">Satellites in Constellation</div>
-                <input type="number" id="con-numsats" value="3" min="2" max="24" />
-              </div>
-              <div class="instrument">
-                <div class="instrument-label">Target Orbit Altitude (km)</div>
-                <input type="number" id="con-altitude" value="1000" min="1" step="10" />
-              </div>
+              <div class="instrument"><div class="instrument-label">Target Body</div><select id="con-body"></select></div>
+              <div class="instrument"><div class="instrument-label">Satellites in Constellation</div><input type="number" id="con-numsats" value="3" min="2" max="24" /></div>
+              <div class="instrument"><div class="instrument-label">Target Orbit Altitude (km)</div><input type="number" id="con-altitude" value="1000" min="1" step="10" /></div>
             </div>
+          </div>
+          <div class="panel" style="background:rgba(0,212,255,0.03);border-color:rgba(0,212,255,0.1);padding:10px 14px;font-size:10px;color:var(--tx-mid);line-height:1.6">
+            <b style="color:var(--cyan)">3D Controls:</b> Drag to rotate · Scroll to zoom · Right-drag to orbit
           </div>
         </div>
 
         <div class="calc-viz">
-          <div class="crt-panel">
-            <div class="crt-bezel">
-              <div class="crt-screen-wrap">
-                <canvas class="viz-canvas" id="con-canvas" width="640" height="360"></canvas>
-              </div>
+          <div class="mfds-outer">
+            <div class="mfds-inner">
+              <canvas class="viz-canvas" id="con-canvas" width="640" height="360"></canvas>
             </div>
-            <div class="crt-footer">
-              <span class="crt-model">KCS-VDU · CONSTELLATION VIEW</span>
-              <span class="crt-power-led"></span>
+            <div class="mfds-statusbar">
+              <span class="mfds-id">KCS-MFDS-01 · CONSTELLATION VIEW · 3D WIREFRAME</span>
+              <div class="mfds-sys">
+                <div class="mfds-dot active"></div>
+                <div class="mfds-dot warn"></div>
+                <div class="mfds-dot off"></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="calc-output panel panel-rivets" id="con-results">
-          <div class="panel-body" style="padding:16px">
-            <!-- populated by JS -->
-          </div>
+        <div class="calc-output panel" id="con-results" style="min-height:80px">
+          <!-- populated by JS -->
         </div>
 
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB: TRANSFER
-    ════════════════════════════════ -->
+    <!-- ════════════════ TRANSFER ════════════════ -->
     <div class="tab-panel" id="tab-transfer">
       <div class="tab-heading">TRANSFER ORBIT CALCULATOR</div>
       <div class="calc-layout">
 
         <div class="calc-inputs">
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Departure</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Departure</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Body</div>
-                <select id="trn-departure"></select>
-              </div>
-              <div class="instrument">
-                <div class="instrument-label">Parking Orbit Altitude (km)</div>
-                <input type="number" id="trn-dep-alt" value="80" min="1" step="10" />
-              </div>
+              <div class="instrument"><div class="instrument-label">Body</div><select id="trn-departure"></select></div>
+              <div class="instrument"><div class="instrument-label">Parking Orbit Alt (km)</div><input type="number" id="trn-dep-alt" value="80" min="1" step="10" /></div>
             </div>
           </div>
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Arrival</span>
-              <span class="panel-header-led" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Arrival</span><span class="panel-header-led" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Body</div>
-                <select id="trn-arrival"></select>
-              </div>
-              <div class="instrument">
-                <div class="instrument-label">Target Orbit Altitude (km)</div>
-                <input type="number" id="trn-arr-alt" value="60" min="1" step="10" />
-              </div>
+              <div class="instrument"><div class="instrument-label">Body</div><select id="trn-arrival"></select></div>
+              <div class="instrument"><div class="instrument-label">Target Orbit Alt (km)</div><input type="number" id="trn-arr-alt" value="60" min="1" step="10" /></div>
             </div>
+          </div>
+          <div class="panel" style="background:rgba(0,212,255,0.03);border-color:rgba(0,212,255,0.1);padding:10px 14px;font-size:10px;color:var(--tx-mid);line-height:1.6">
+            <b style="color:var(--cyan)">3D Controls:</b> Drag to rotate · Scroll to zoom
           </div>
         </div>
 
         <div class="calc-viz">
-          <div class="crt-panel">
-            <div class="crt-bezel">
-              <div class="crt-screen-wrap">
-                <canvas class="viz-canvas" id="trn-canvas" width="640" height="360"></canvas>
-              </div>
+          <div class="mfds-outer">
+            <div class="mfds-inner">
+              <canvas class="viz-canvas" id="trn-canvas" width="640" height="360"></canvas>
             </div>
-            <div class="crt-footer">
-              <span class="crt-model">KCS-VDU · TRANSFER TRAJECTORY</span>
-              <span class="crt-power-led"></span>
+            <div class="mfds-statusbar">
+              <span class="mfds-id">KCS-MFDS-02 · TRANSFER TRAJECTORY · 3D VIEW</span>
+              <div class="mfds-sys">
+                <div class="mfds-dot active"></div><div class="mfds-dot off"></div><div class="mfds-dot off"></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="calc-output panel panel-rivets" id="trn-results">
-          <div class="panel-body" style="padding:16px">
-            <!-- populated by JS -->
-          </div>
-        </div>
+        <div class="calc-output panel" id="trn-results" style="min-height:80px"><!-- JS --></div>
 
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB: DELTA-V
-    ════════════════════════════════ -->
+    <!-- ════════════════ MISSION ΔV ════════════════ -->
     <div class="tab-panel" id="tab-deltav">
-      <div class="tab-heading">DELTA-V BUDGET CALCULATOR</div>
+      <div class="tab-heading">MISSION DELTA-V PLANNER</div>
       <div class="calc-layout">
 
         <div class="calc-inputs">
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">TWR Reference</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Mission Profile</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Body</div>
-                <select id="dv-body"></select>
+              <div class="instrument"><div class="instrument-label">Destination</div><select id="dv-dest"></select></div>
+              <div class="instrument"><div class="instrument-label">Mission Type</div>
+                <select id="dv-mission">
+                  <option value="flyby">Flyby</option>
+                  <option value="orbit">Orbit</option>
+                  <option value="land">Land (one way)</option>
+                  <option value="land_return" selected>Land + Return</option>
+                </select>
               </div>
-              <div class="instrument">
-                <div class="instrument-label">Altitude (km)</div>
-                <input type="number" id="dv-alt" value="0" min="0" step="1" />
-              </div>
+              <div class="instrument"><div class="instrument-label">LKO Altitude (km)</div><input type="number" id="dv-lko-alt" value="80" min="0" /></div>
+              <div class="instrument" id="dv-dest-orb-row"><div class="instrument-label">Destination Orbit Alt (km)</div><input type="number" id="dv-dest-orb" value="30" min="0" /></div>
             </div>
           </div>
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Rocket Stages</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Options</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div id="dv-stages"></div>
-              <button class="btn" id="dv-add-stage">+ ADD STAGE</button>
+              <div class="toggle-row"><label class="toggle-label"><input type="checkbox" id="dv-include-launch" checked />Include Kerbin Launch</label></div>
+              <div class="toggle-row" id="dv-aerobrake-dest-row"><label class="toggle-label"><input type="checkbox" id="dv-aerobrake-dest" checked />Aerobrake at Destination</label></div>
+              <div class="toggle-row"><label class="toggle-label"><input type="checkbox" id="dv-aerobrake-kerbin" checked />Aerobrake at Kerbin Return</label></div>
             </div>
           </div>
         </div>
 
         <div class="calc-viz">
-          <div class="crt-panel">
-            <div class="crt-bezel">
-              <div class="crt-screen-wrap">
-                <canvas class="viz-canvas" id="dv-canvas" width="640" height="300"></canvas>
-              </div>
+          <div class="mfds-outer">
+            <div class="mfds-inner">
+              <canvas class="viz-canvas" id="dv-canvas" width="640" height="300"></canvas>
             </div>
-            <div class="crt-footer">
-              <span class="crt-model">KCS-VDU · DELTA-V BREAKDOWN</span>
-              <span class="crt-power-led"></span>
+            <div class="mfds-statusbar">
+              <span class="mfds-id">KCS-MFDS-03 · MISSION ΔV BREAKDOWN</span>
+              <div class="mfds-sys">
+                <div class="mfds-dot active"></div><div class="mfds-dot off"></div><div class="mfds-dot off"></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="calc-output panel panel-rivets" id="dv-results">
-          <div class="panel-body" style="padding:16px">
-            <!-- populated by JS -->
-          </div>
-        </div>
+        <div class="calc-output panel" id="dv-results" style="min-height:80px"><!-- JS --></div>
 
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB: ORBIT
-    ════════════════════════════════ -->
+    <!-- ════════════════ ORBIT ════════════════ -->
     <div class="tab-panel" id="tab-orbit">
       <div class="tab-heading">ORBITAL MECHANICS CALCULATOR</div>
       <div class="calc-layout">
 
         <div class="calc-inputs">
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Orbit Parameters</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Orbit Parameters</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Body</div>
-                <select id="orb-body"></select>
-              </div>
-              <div class="instrument">
-                <div class="instrument-label">Periapsis Altitude (km)</div>
-                <input type="number" id="orb-pe" value="80" min="0" step="10" />
-              </div>
-              <div class="instrument">
-                <div class="instrument-label">Apoapsis Altitude (km)</div>
-                <input type="number" id="orb-ap" value="80" min="0" step="10" />
-              </div>
+              <div class="instrument"><div class="instrument-label">Body</div><select id="orb-body"></select></div>
+              <div class="instrument"><div class="instrument-label">Periapsis Altitude (km)</div><input type="number" id="orb-pe" value="80" min="0" step="10" /></div>
+              <div class="instrument"><div class="instrument-label">Apoapsis Altitude (km)</div><input type="number" id="orb-ap" value="80" min="0" step="10" /></div>
             </div>
+          </div>
+          <div class="panel" style="background:rgba(0,212,255,0.03);border-color:rgba(0,212,255,0.1);padding:10px 14px;font-size:10px;color:var(--tx-mid);line-height:1.6">
+            <b style="color:var(--cyan)">3D Controls:</b> Drag to rotate · Scroll to zoom<br/>
+            <span style="color:#334">Orange arrow = Pe velocity · Green arrow = Ap velocity</span>
           </div>
         </div>
 
         <div class="calc-viz">
-          <div class="crt-panel">
-            <div class="crt-bezel">
-              <div class="crt-screen-wrap">
-                <canvas class="viz-canvas" id="orb-canvas" width="640" height="360"></canvas>
-              </div>
+          <div class="mfds-outer">
+            <div class="mfds-inner">
+              <canvas class="viz-canvas" id="orb-canvas" width="640" height="360"></canvas>
             </div>
-            <div class="crt-footer">
-              <span class="crt-model">KCS-VDU · ORBITAL DIAGRAM</span>
-              <span class="crt-power-led"></span>
+            <div class="mfds-statusbar">
+              <span class="mfds-id">KCS-MFDS-04 · ORBITAL DIAGRAM · 3D WIREFRAME</span>
+              <div class="mfds-sys">
+                <div class="mfds-dot active"></div><div class="mfds-dot active"></div><div class="mfds-dot off"></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="calc-output panel panel-rivets" id="orb-results">
-          <div class="panel-body" style="padding:16px">
-            <!-- populated by JS -->
-          </div>
-        </div>
+        <div class="calc-output panel" id="orb-results" style="min-height:80px"><!-- JS --></div>
 
       </div>
     </div>
 
-    <!-- ════════════════════════════════
-         TAB: COMMNET
-    ════════════════════════════════ -->
+    <!-- ════════════════ COMMNET ════════════════ -->
     <div class="tab-panel" id="tab-commnet">
       <div class="tab-heading">COMMNET RANGE CALCULATOR</div>
       <div class="calc-layout">
 
         <div class="calc-inputs">
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Vessel Antenna</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Vessel Antenna</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Antenna Type</div>
-                <select id="cn-vessel-ant"></select>
-              </div>
+              <div class="instrument"><div class="instrument-label">Antenna Type</div><select id="cn-vessel-ant"></select></div>
               <div id="cn-vessel-custom" style="display:none">
-                <div class="instrument">
-                  <div class="instrument-label">Custom Power (W)</div>
-                  <input type="number" id="cn-vessel-custom-val" value="100000000000" min="1" />
-                </div>
+                <div class="instrument"><div class="instrument-label">Custom Power (W)</div><input type="number" id="cn-vessel-custom-val" value="100000000000" min="1" /></div>
               </div>
             </div>
           </div>
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Relay / Ground Station</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Relay / Ground Station</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Relay Antenna</div>
-                <select id="cn-relay-ant"></select>
-              </div>
+              <div class="instrument"><div class="instrument-label">Relay Antenna</div><select id="cn-relay-ant"></select></div>
               <div id="cn-relay-custom" style="display:none">
-                <div class="instrument">
-                  <div class="instrument-label">Custom Power (W)</div>
-                  <input type="number" id="cn-relay-custom-val" value="100000000000000" min="1" />
-                </div>
+                <div class="instrument"><div class="instrument-label">Custom Power (W)</div><input type="number" id="cn-relay-custom-val" value="100000000000000" min="1" /></div>
               </div>
-              <div class="instrument">
-                <div class="instrument-label">DSN Level</div>
-                <select id="cn-dsn"></select>
-              </div>
-              <div class="instrument">
-                <div class="instrument-label">Relays in Chain</div>
-                <input type="number" id="cn-num-relays" value="0" min="0" max="20" />
-              </div>
+              <div class="instrument"><div class="instrument-label">DSN Level</div><select id="cn-dsn"></select></div>
+              <div class="instrument"><div class="instrument-label">Relays in Chain</div><input type="number" id="cn-num-relays" value="0" min="0" max="20" /></div>
             </div>
           </div>
-          <div class="panel panel-rivets">
-            <div class="panel-header">
-              <span class="panel-header-text">Signal Check</span>
-              <span class="panel-header-led"></span>
-            </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Signal Check</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
-              <div class="instrument">
-                <div class="instrument-label">Distance to Check (Mm) — 0 = skip</div>
-                <input type="number" id="cn-distance" value="0" min="0" step="100" />
-              </div>
+              <div class="instrument"><div class="instrument-label">Distance to Check (Mm) — 0 = skip</div><input type="number" id="cn-distance" value="0" min="0" step="100" /></div>
             </div>
           </div>
         </div>
 
         <div class="calc-viz">
-          <div class="crt-panel">
-            <div class="crt-bezel">
-              <div class="crt-screen-wrap">
-                <canvas class="viz-canvas" id="cn-canvas" width="640" height="280"></canvas>
-              </div>
+          <div class="mfds-outer">
+            <div class="mfds-inner">
+              <canvas class="viz-canvas" id="cn-canvas" width="640" height="280"></canvas>
             </div>
-            <div class="crt-footer">
-              <span class="crt-model">KCS-VDU · SIGNAL DIAGRAM</span>
-              <span class="crt-power-led"></span>
+            <div class="mfds-statusbar">
+              <span class="mfds-id">KCS-MFDS-05 · COMMNET SIGNAL DIAGRAM</span>
+              <div class="mfds-sys">
+                <div class="mfds-dot active"></div><div class="mfds-dot off"></div><div class="mfds-dot off"></div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="calc-output panel panel-rivets" id="cn-results">
-          <div class="panel-body" style="padding:16px">
-            <!-- populated by JS -->
-          </div>
-        </div>
+        <div class="calc-output panel" id="cn-results" style="min-height:80px"><!-- JS --></div>
 
       </div>
     </div>
 
   </main>
-</div><!-- #app -->
+</div>
+
+<!-- Three.js r134 + OrbitControls (UMD globals) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
 
 <script src="js/data.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/viz.js"></script>
+<script src="js/scene3d.js"></script>
 <script src="js/constellation.js"></script>
 <script src="js/transfer.js"></script>
 <script src="js/deltav.js"></script>

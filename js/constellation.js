@@ -135,7 +135,11 @@ function calcConstellation() {
     </div>
   `;
 
-  drawConstellationViz(bodyKey, n, alt, minAlt, a_res, pe_res, ap_res, losOK);
+  if (window.updateConst3D) {
+    updateConst3D({ bodyKey, n, alt, minAlt, a_res, pe_res, ap_res, losOK });
+  } else {
+    drawConstellationViz(bodyKey, n, alt, minAlt, a_res, pe_res, ap_res, losOK);
+  }
 }
 
 function drawConstellationViz(bodyKey, n, alt, minAlt, a_res, pe_res, ap_res, losOK) {

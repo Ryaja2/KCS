@@ -130,7 +130,11 @@ function calcTransfer() {
     </div>
   `;
 
-  drawTransferViz(depKey, arrKey, hoh, r1, r2);
+  if (window.updateTransfer3D) {
+    updateTransfer3D({ depKey, arrKey, r1, r2, a_transfer: hoh.a_transfer });
+  } else {
+    drawTransferViz(depKey, arrKey, hoh, r1, r2);
+  }
 }
 
 function drawTransferViz(depKey, arrKey, hoh, r1, r2) {

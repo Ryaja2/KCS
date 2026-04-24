@@ -12,7 +12,7 @@ function updateClock() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Stars background
+  // Background starfield
   const starsEl = document.getElementById('stars-canvas');
   if (starsEl) {
     const ctx = starsEl.getContext('2d');
@@ -37,11 +37,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function showTab(id) {
     navBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === id));
     tabs.forEach(t => t.classList.toggle('active', t.id === 'tab-' + id));
-    if (id === 'constellation') calcConstellation();
-    if (id === 'transfer')      calcTransfer();
-    if (id === 'deltav')        calcDeltaV();
-    if (id === 'orbit')         calcOrbit();
-    if (id === 'commnet')       calcCommNet();
+
+    // Sync canvas sizes for 3D scenes when tab becomes visible
+    requestAnimationFrame(() => {
+      ['con-canvas','trn-canvas','orb-canvas'].forEach(resize3DCanvas);
+
+      if (id === 'constellation') calcConstellation();
+      if (id === 'transfer')      calcTransfer();
+      if (id === 'deltav')        calcMissionDv();
+      if (id === 'orbit')         calcOrbit();
+      if (id === 'commnet')       calcCommNet();
+    });
   }
 
   navBtns.forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
@@ -53,19 +59,26 @@ document.addEventListener('DOMContentLoaded', () => {
   initOrbit();
   initCommNet();
 
-  // Resize canvases
-  function resizeCanvases() {
-    document.querySelectorAll('canvas.viz-canvas').forEach(canvas => {
+  // Resize 2D canvases (dv + commnet)
+  function resize2DCanvases() {
+    ['dv-canvas','cn-canvas'].forEach(id => {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
       const w = canvas.parentElement.clientWidth;
       if (w > 0 && canvas.width !== w) {
         canvas.width  = w;
-        canvas.height = Math.min(Math.round(w * 0.55), 380);
+        canvas.height = Math.min(Math.round(w * 0.52), 360);
       }
     });
-    const active = document.querySelector('.ctrl-btn.active');
-    if (active) showTab(active.dataset.tab);
   }
 
-  window.addEventListener('resize', resizeCanvases);
-  resizeCanvases();
+  window.addEventListener('resize', () => {
+    resize2DCanvases();
+    ['con-canvas','trn-canvas','orb-canvas'].forEach(resize3DCanvas);
+    const active = document.querySelector('.ctrl-btn.active');
+    if (active) showTab(active.dataset.tab);
+  });
+
+  resize2DCanvases();
+  showTab('constellation');
 });

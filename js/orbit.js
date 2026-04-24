@@ -110,7 +110,11 @@ function calcOrbit() {
     </div>
   `;
 
-  drawOrbitViz(bodyKey, peAlt, apAlt);
+  if (window.updateOrbit3D) {
+    updateOrbit3D({ bodyKey, peAlt, apAlt });
+  } else {
+    drawOrbitViz(bodyKey, peAlt, apAlt);
+  }
 }
 
 function drawOrbitViz(bodyKey, peAlt, apAlt) {
