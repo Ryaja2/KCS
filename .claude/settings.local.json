@@ -3,7 +3,17 @@
     "allow": [
       "Bash(git init *)",
       "Bash(git remote *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git config *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(git commit -m 'fix: enable Pages auto-enablement in deploy workflow *)",
+      "Bash(git commit -m 'fix: revert to standard Pages deploy workflow *)",
+      "Bash(git commit -m 'fix: deploy from master branch *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git commit -m 'feat: retro-futuristic control panel redesign + fix resonant orbit Pe/Ap *)"
     ]
   }
 }

@@ -90,10 +90,13 @@ function calcCommNet() {
 
   function signalBar(s) {
     const pct = (s * 100).toFixed(1);
-    const col = s > 0.75 ? '#00ff88' : s > 0.4 ? '#ffaa00' : s > 0 ? '#ff6644' : '#ff2222';
+    const col = s > 0.75 ? 'var(--green)' : s > 0.4 ? 'var(--amber)' : s > 0 ? '#ff8844' : 'var(--red)';
+    const glow = s > 0.75 ? 'var(--green-glow)' : s > 0.4 ? 'var(--amber-glow)' : 'var(--red-glow)';
     return `<div class="signal-bar-wrap">
-      <div class="signal-bar" style="width:${pct}%;background:${col}"></div>
-      <span class="signal-pct" style="color:${col}">${pct}%</span>
+      <div class="signal-bar-track">
+        <div class="signal-bar" style="width:${pct}%;background:${col};box-shadow:0 0 6px ${glow}"></div>
+      </div>
+      <span class="signal-pct" style="color:${col};text-shadow:0 0 8px ${glow}">${pct}%</span>
     </div>`;
   }
 
