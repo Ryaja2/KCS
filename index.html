@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KCS — Kerbal Calculator Suite</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<canvas id="stars-canvas"></canvas>
+
+<div id="app">
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🚀</span>
+      <h1>KCS</h1>
+      <span class="logo-sub">Kerbal Calculator Suite</span>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-tab="constellation">Constellation</button>
+      <button class="nav-btn" data-tab="transfer">Transfer</button>
+      <button class="nav-btn" data-tab="deltav">Delta-V</button>
+      <button class="nav-btn" data-tab="orbit">Orbit</button>
+      <button class="nav-btn" data-tab="commnet">CommNet</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ======== CONSTELLATION ======== -->
+    <div class="tab-panel active" id="tab-constellation">
+      <div class="tab-heading">RELAY CONSTELLATION</div>
+      <div class="calc-layout">
+        <div class="calc-inputs">
+          <div class="card">
+            <div class="card-title">Configuration</div>
+            <div class="form-row">
+              <label>Body
+                <select id="con-body"></select>
+              </label>
+              <label>Number of Satellites
+                <input type="number" id="con-numsats" value="3" min="2" max="24" />
+              </label>
+              <label>Target Altitude (km)
+                <input type="number" id="con-altitude" value="1000" min="1" step="10" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-viz">
+          <canvas class="viz-canvas" id="con-canvas" width="640" height="360"></canvas>
+        </div>
+
+        <div class="calc-output card" id="con-results">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== TRANSFER ======== -->
+    <div class="tab-panel" id="tab-transfer">
+      <div class="tab-heading">TRANSFER ORBIT</div>
+      <div class="calc-layout">
+        <div class="calc-inputs">
+          <div class="card">
+            <div class="card-title">Departure</div>
+            <div class="form-row">
+              <label>Body
+                <select id="trn-departure"></select>
+              </label>
+              <label>Parking Orbit Altitude (km)
+                <input type="number" id="trn-dep-alt" value="80" min="1" step="10" />
+              </label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Arrival</div>
+            <div class="form-row">
+              <label>Body
+                <select id="trn-arrival"></select>
+              </label>
+              <label>Target Orbit Altitude (km)
+                <input type="number" id="trn-arr-alt" value="60" min="1" step="10" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-viz">
+          <canvas class="viz-canvas" id="trn-canvas" width="640" height="360"></canvas>
+        </div>
+
+        <div class="calc-output card" id="trn-results">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== DELTA-V ======== -->
+    <div class="tab-panel" id="tab-deltav">
+      <div class="tab-heading">DELTA-V CALCULATOR</div>
+      <div class="calc-layout">
+        <div class="calc-inputs">
+          <div class="card">
+            <div class="card-title">TWR Reference</div>
+            <div class="form-row">
+              <label>Body
+                <select id="dv-body"></select>
+              </label>
+              <label>Altitude (km)
+                <input type="number" id="dv-alt" value="0" min="0" step="1" />
+              </label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Stages</div>
+            <div id="dv-stages"></div>
+            <button class="btn" id="dv-add-stage">+ Add Stage</button>
+          </div>
+        </div>
+
+        <div class="calc-viz">
+          <canvas class="viz-canvas" id="dv-canvas" width="640" height="300"></canvas>
+        </div>
+
+        <div class="calc-output card" id="dv-results">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== ORBIT ======== -->
+    <div class="tab-panel" id="tab-orbit">
+      <div class="tab-heading">ORBIT CALCULATOR</div>
+      <div class="calc-layout">
+        <div class="calc-inputs">
+          <div class="card">
+            <div class="card-title">Orbit Parameters</div>
+            <div class="form-row">
+              <label>Body
+                <select id="orb-body"></select>
+              </label>
+              <label>Periapsis Altitude (km)
+                <input type="number" id="orb-pe" value="80" min="0" step="10" />
+              </label>
+              <label>Apoapsis Altitude (km)
+                <input type="number" id="orb-ap" value="80" min="0" step="10" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-viz">
+          <canvas class="viz-canvas" id="orb-canvas" width="640" height="360"></canvas>
+        </div>
+
+        <div class="calc-output card" id="orb-results">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== COMMNET ======== -->
+    <div class="tab-panel" id="tab-commnet">
+      <div class="tab-heading">COMMNET RANGE</div>
+      <div class="calc-layout">
+        <div class="calc-inputs">
+          <div class="card">
+            <div class="card-title">Vessel Antenna</div>
+            <div class="form-row">
+              <label>Antenna
+                <select id="cn-vessel-ant"></select>
+              </label>
+              <div id="cn-vessel-custom" style="display:none">
+                <label>Custom Power (W)
+                  <input type="number" id="cn-vessel-custom-val" value="1e11" min="1" />
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Relay / Ground</div>
+            <div class="form-row">
+              <label>Relay Antenna
+                <select id="cn-relay-ant"></select>
+              </label>
+              <div id="cn-relay-custom" style="display:none">
+                <label>Custom Power (W)
+                  <input type="number" id="cn-relay-custom-val" value="1e14" min="1" />
+                </label>
+              </div>
+              <label>DSN Level
+                <select id="cn-dsn"></select>
+              </label>
+              <label>Number of Relays in Chain
+                <input type="number" id="cn-num-relays" value="0" min="0" max="20" step="1" />
+              </label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Signal Check</div>
+            <div class="form-row">
+              <label>Distance to Check (Mm)
+                <input type="number" id="cn-distance" value="0" min="0" step="100" />
+              </label>
+              <div class="result-sub" style="padding:4px 0">0 = skip signal check</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="calc-viz">
+          <canvas class="viz-canvas" id="cn-canvas" width="640" height="280"></canvas>
+        </div>
+
+        <div class="calc-output card" id="cn-results">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/viz.js"></script>
+<script src="js/constellation.js"></script>
+<script src="js/transfer.js"></script>
+<script src="js/deltav.js"></script>
+<script src="js/orbit.js"></script>
+<script src="js/commnet.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

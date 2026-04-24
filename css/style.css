@@ -1,0 +1,407 @@
+/* ============================================================
+   KCS — Kerbal Calculator Suite
+   Dark space theme
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #080c14;
+  --bg2:        #0c1220;
+  --bg3:        #0f1828;
+  --card:       #0d1625;
+  --card-border:#1a2a3e;
+  --accent:     #00d4ff;
+  --green:      #00ff88;
+  --amber:      #ffaa00;
+  --red:        #ff4444;
+  --text:       #d8e8f4;
+  --sub:        #5a7a99;
+  --muted:      #2a3a4e;
+  --font:       'Courier New', 'Consolas', monospace;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  overflow-x: hidden;
+}
+
+/* ---- Stars background ---- */
+#stars-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+/* ---- Layout ---- */
+#app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---- Header ---- */
+header {
+  background: linear-gradient(180deg, #0a1020ee, #080c14dd);
+  border-bottom: 1px solid var(--card-border);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(6px);
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px 0;
+  white-space: nowrap;
+}
+
+.logo-icon { font-size: 22px; }
+
+.logo h1 {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--accent);
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px var(--accent);
+}
+
+.logo-sub {
+  font-size: 11px;
+  color: var(--sub);
+  letter-spacing: 1px;
+}
+
+nav {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  padding: 10px 0;
+}
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid var(--muted);
+  color: var(--sub);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 6px 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+
+.nav-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.nav-btn.active {
+  background: rgba(0, 212, 255, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent);
+}
+
+/* ---- Main ---- */
+main {
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ---- Tab panels ---- */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---- Calculator layout ---- */
+.calc-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .calc-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.calc-inputs {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calc-viz {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.calc-output {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+/* ---- Cards ---- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.card-title {
+  font-size: 11px;
+  color: var(--sub);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--muted);
+}
+
+/* ---- Form elements ---- */
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--sub);
+  letter-spacing: 0.5px;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  background: var(--bg2);
+  border: 1px solid var(--muted);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 7px 10px;
+  border-radius: 4px;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+select option { background: var(--bg2); }
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  background: rgba(0,212,255,0.1);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 12px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+
+.btn:hover {
+  background: rgba(0,212,255,0.2);
+  text-shadow: 0 0 10px var(--accent);
+}
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid #33445a;
+  color: var(--sub);
+  font-size: 12px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-icon:hover { border-color: var(--red); color: var(--red); }
+
+/* ---- Canvas viz ---- */
+.viz-canvas {
+  display: block;
+  width: 100%;
+  border-radius: 6px;
+  background: #080c14;
+  border: 1px solid var(--card-border);
+}
+
+/* ---- Results ---- */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.result-card {
+  background: var(--bg3);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+}
+
+.result-card.accent { border-color: rgba(0,212,255,0.3); }
+.result-card.ok     { border-color: rgba(0,255,136,0.3); }
+.result-card.warn   { border-color: rgba(255,68,68,0.35); background: rgba(255,40,40,0.04); }
+
+.result-label {
+  font-size: 10px;
+  color: var(--sub);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.result-value {
+  font-size: 16px;
+  color: var(--text);
+  font-weight: bold;
+}
+
+.result-sub {
+  font-size: 10px;
+  color: var(--sub);
+  margin-top: 3px;
+}
+
+.section-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--sub);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.info-box {
+  background: rgba(0,212,255,0.05);
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: #6a9ab8;
+  line-height: 1.6;
+  margin-top: 12px;
+}
+
+.warn-text { color: var(--red); font-size: 13px; padding: 10px 0; }
+
+/* ---- Delta-V stages ---- */
+.stage-card {
+  background: var(--bg3);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.stage-name {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--muted);
+  color: var(--accent);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: bold;
+  width: 160px;
+  padding: 2px 4px;
+}
+
+.stage-name:focus { outline: none; border-bottom-color: var(--accent); }
+
+.stage-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* ---- CommNet signal bar ---- */
+.signal-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 2px;
+}
+
+.signal-bar {
+  height: 8px;
+  border-radius: 4px;
+  min-width: 4px;
+  flex-grow: 0;
+  transition: width 0.3s;
+}
+
+.signal-pct {
+  font-size: 14px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ---- Tab headings ---- */
+.tab-heading {
+  font-size: 18px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  text-shadow: 0 0 16px var(--accent);
+}
+
+/* ---- Range slider ---- */
+input[type="range"] {
+  accent-color: var(--accent);
+  width: 100%;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  header { flex-direction: column; align-items: flex-start; padding: 10px 14px; }
+  main { padding: 12px; }
+  .result-grid { grid-template-columns: 1fr 1fr; }
+  .stage-inputs { grid-template-columns: 1fr; }
+}
