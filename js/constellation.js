@@ -164,14 +164,18 @@ function calcConstellation() {
   const interSatOK    = interSatRange >= chord;
 
   // KSC-to-orbit max slant range: when sat is on horizon from ground station
-  // d = sqrt(r_target² - r_body²)
   const slantRange    = Math.sqrt(r_target * r_target - body.radius * body.radius);
   const groundRange   = relayPower && dsnPower ? commnetRange(relayPower, dsnPower) : 0;
   const groundOK      = groundRange >= slantRange;
 
   // Min power needed for each link
-  const minInterSatPower  = chord;                            // P such that sqrt(P*P) = chord
-  const minGroundPower    = dsnPower ? (slantRange * slantRange) / dsnPower : 0;
+  const minInterSatPower = chord;
+  const minGroundPower   = dsnPower ? (slantRange * slantRange) / dsnPower : 0;
+
+  // Minimum DSN level required for ground coverage with selected relay
+  const minDsnEntry = relayPower
+    ? Object.entries(DSN_LEVELS).find(([, p]) => commnetRange(relayPower, p) >= slantRange)
+    : null;
 
   const resultsEl = document.getElementById('con-results');
   resultsEl.innerHTML = `
@@ -268,9 +272,25 @@ function calcConstellation() {
         </div>
         <div class="result-card ${groundOK ? 'ok' : 'warn'}">
           <div class="result-label">Ground ↔ Constellation</div>
-          <div class="result-value" style="font-size:18px">${groundOK ? 'COVERED' : 'BELOW RANGE'}</div>
-          <div class="result-sub">${groundRange ? formatDistance(groundRange) + ' range vs DSN ' + dsnKey.split(' ')[0] + ' ' + dsnKey.split(' ')[1] : 'No antenna'} · min power ${formatPower(minGroundPower)}</div>
+          <div class="result-value" style="font-size:18px">${groundOK ? 'COVERED' : 'NEED UPGRADE'}</div>
+          <div class="result-sub">${minDsnEntry ? 'Min DSN: ' + minDsnEntry[0] : 'No DSN level sufficient'} · min relay power ${formatPower(minGroundPower)}</div>
         </div>
+      </div>
+      <table class="dsn-table" style="margin-top:8px">
+        <thead><tr><th>DSN Level</th><th>Ground Range</th><th>Covers KSC?</th></tr></thead>
+        <tbody>
+          ${Object.entries(DSN_LEVELS).map(([name, p]) => {
+            const gr  = relayPower ? commnetRange(relayPower, p) : 0;
+            const ok  = gr >= slantRange;
+            const sel = name === dsnKey;
+            return `<tr class="${sel ? 'dsn-row-sel' : ''}">
+              <td>${name}${sel ? ' ◀' : ''}</td>
+              <td>${gr ? formatDistance(gr) : '—'}</td>
+              <td style="color:${ok ? 'var(--green)' : 'var(--red)'}">${ok ? 'YES' : 'NO'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
       </div>
     </div>
   `;

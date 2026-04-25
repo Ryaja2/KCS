@@ -104,7 +104,7 @@ html, body {
 
 .mission-clock-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .clock-label { font-family: var(--f-ui); font-size: 7px; letter-spacing: 3px; color: var(--tx-dim); }
-#mission-clock { font-family: var(--f-disp); font-size: 28px; color: var(--green); letter-spacing: 2px; text-shadow: 0 0 14px var(--green-glow); }
+#mission-clock { font-family: var(--f-disp); font-size: 28px; color: var(--green); letter-spacing: 2px; text-shadow: 0 0 14px var(--green-glow); line-height: 1.2; }
 
 /* ─── NAV ────────────────────────────────────────────── */
 nav.control-panel-nav { display: flex; gap: 5px; padding: 10px 0; flex-wrap: wrap; }
@@ -213,7 +213,8 @@ select {
   border-top: 2px solid var(--m0);
   color: var(--amber);
   font-family: var(--f-disp); font-size: 21px; letter-spacing: 1px;
-  padding: 3px 10px 1px;
+  padding: 5px 10px 3px;
+  line-height: 1.3;
   border-radius: 0 0 3px 3px;
   width: 100%;
   text-shadow: 0 0 9px var(--amber-glow);
@@ -404,7 +405,7 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
 .result-card.warn   { border-color: rgba(255,58,26,0.3);  background: rgba(255,30,10,0.03); }
 
 .result-label { font-family: var(--f-ui); font-size: 7px; letter-spacing: 2px; color: var(--tx-dim); text-transform: uppercase; margin-bottom: 5px; }
-.result-value { font-family: var(--f-disp); font-size: 28px; color: var(--amber); text-shadow: 0 0 10px var(--amber-glow); line-height: 1; letter-spacing: 1px; }
+.result-value { font-family: var(--f-disp); font-size: 28px; color: var(--amber); text-shadow: 0 0 10px var(--amber-glow); line-height: 1.15; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-card.ok   .result-value { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
 .result-card.warn .result-value { color: var(--red);   text-shadow: 0 0 10px var(--red-glow); }
 .result-sub { font-family: var(--f-body); font-size: 10px; color: var(--tx-mid); margin-top: 4px; }
@@ -500,8 +501,135 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
 .signal-pct { font-family: var(--f-disp); font-size: 22px; white-space: nowrap; min-width: 60px; text-align: right; line-height: 1; }
 
 /* ═══════════════════════════════════════════════════════
+   DSN COMPARISON TABLE
+═══════════════════════════════════════════════════════ */
+.dsn-table {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--f-body); font-size: 11px; color: var(--tx-mid);
+  border: 1px solid var(--m3); border-radius: 3px; overflow: hidden;
+  margin-top: 6px;
+}
+.dsn-table th {
+  background: var(--m2); color: var(--tx-dim);
+  font-family: var(--f-ui); font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 5px 10px; border-bottom: 1px solid var(--m4); text-align: left;
+}
+.dsn-table td {
+  padding: 5px 10px; border-bottom: 1px solid var(--m3);
+  font-family: var(--f-disp); font-size: 16px; color: var(--tx-mid);
+}
+.dsn-table tr:last-child td { border-bottom: none; }
+.dsn-table td:first-child { font-family: var(--f-ui); font-size: 8px; letter-spacing: 1px; color: var(--tx-dim); }
+.dsn-row-sel td { color: var(--amber) !important; background: rgba(255,179,0,0.04); }
+.dsn-row-sel td:first-child { color: var(--amber) !important; }
+
+/* ═══════════════════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════════════════ */
-@media (max-width: 1100px) { .calc-layout { grid-template-columns: 260px 1fr; } }
-@media (max-width: 920px)  { .calc-layout { grid-template-columns: 1fr; } .calc-inputs,.calc-viz,.calc-output { grid-column: 1; grid-row: auto; } }
-@media (max-width: 600px)  { .mission-header { grid-template-columns: 1fr; gap: 8px; padding: 10px 14px; } .result-grid { grid-template-columns: 1fr 1fr; } .stage-inputs { grid-template-columns: 1fr; } nav.control-panel-nav { flex-wrap: wrap; } }
+
+/* ── 1100px: narrow desktop ── */
+@media (max-width: 1100px) {
+  .calc-layout { grid-template-columns: 255px 1fr; }
+}
+
+/* ── 920px: tablet landscape / stack ── */
+@media (max-width: 920px) {
+  .calc-layout { grid-template-columns: 1fr; }
+  .calc-inputs, .calc-viz, .calc-output { grid-column: 1; grid-row: auto; }
+  .calc-inputs { flex-direction: row; flex-wrap: wrap; }
+  .calc-inputs > .panel { flex: 1 1 260px; }
+}
+
+/* ── 768px: tablet portrait ── */
+@media (max-width: 768px) {
+  .mission-header {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    padding: 8px 14px;
+    gap: 8px 14px;
+  }
+  nav.control-panel-nav { grid-column: 1 / -1; padding: 4px 0; gap: 4px; }
+  .badge-sub { display: none; }
+  .badge-title { font-size: 18px; letter-spacing: 4px; }
+  main { padding: 14px; }
+  .phase-row { grid-template-columns: 120px 1fr 80px; }
+  .phase-name { font-size: 7px; }
+}
+
+/* ── 600px: large phone ── */
+@media (max-width: 600px) {
+  html { scroll-padding-top: 120px; }
+
+  .mission-header {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  .mission-header > div:first-child { display: flex; align-items: center; justify-content: space-between; }
+  .mission-clock-wrap { align-items: flex-start; }
+  #mission-clock { font-size: 22px; letter-spacing: 1px; }
+  .clock-label { font-size: 6px; letter-spacing: 2px; }
+  .status-rack { display: none; }
+
+  nav.control-panel-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px; padding: 0;
+  }
+  .ctrl-btn {
+    padding: 10px 4px;
+    font-size: 7px; letter-spacing: 1px;
+    text-align: center;
+    min-height: 40px;
+    padding-left: 4px;
+  }
+  .ctrl-btn::before { display: none; }
+
+  main { padding: 10px; }
+  .tab-heading { font-size: 9px; letter-spacing: 3px; margin-bottom: 10px; }
+
+  .calc-inputs { flex-direction: column; }
+  .calc-inputs > .panel { flex: none; }
+
+  .result-grid { grid-template-columns: 1fr 1fr; }
+  .result-value { font-size: 22px; }
+  .phase-total-val { font-size: 26px; }
+
+  .stage-inputs { grid-template-columns: 1fr; }
+
+  .mfds-outer { padding: 10px 10px 14px; }
+  .mfds-id { font-size: 6px; letter-spacing: 1px; }
+
+  .dsn-table td { font-size: 13px; padding: 4px 7px; }
+  .dsn-table th { padding: 4px 7px; }
+}
+
+/* ── 480px: small phone ── */
+@media (max-width: 480px) {
+  nav.control-panel-nav { grid-template-columns: repeat(2, 1fr); }
+
+  .result-grid { grid-template-columns: 1fr; }
+  .result-value { font-size: 20px; }
+
+  .period-inputs { grid-template-columns: repeat(2, 1fr); }
+
+  .phase-row {
+    grid-template-columns: 1fr 72px;
+    gap: 6px;
+  }
+  .phase-bar-wrap { display: none; }
+  .phase-name { grid-column: 1 / -1; margin-bottom: 2px; }
+
+  input[type="number"], input[type="text"], select { font-size: 17px; }
+
+  .badge-hex { width: 32px; height: 32px; }
+  .badge-title { font-size: 15px; letter-spacing: 3px; }
+}
+
+/* ── touch: ensure tap targets ── */
+@media (pointer: coarse) {
+  .ctrl-btn { min-height: 44px; }
+  input[type="number"], select { min-height: 40px; }
+  input[type="checkbox"] { width: 18px; height: 18px; }
+}

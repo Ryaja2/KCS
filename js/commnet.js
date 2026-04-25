@@ -122,22 +122,34 @@ function calcCommNet() {
         <div class="result-value">${formatPower(dsnPower)}</div>
       </div>
     </div>
-    <div class="section-title" style="margin-top:16px">Range</div>
-    <div class="result-grid">
-      <div class="result-card accent">
-        <div class="result-label">Direct Range (Vessel ↔ DSN)</div>
-        <div class="result-value">${formatDistance(directRange)}</div>
-      </div>
+    <div class="section-title" style="margin-top:16px">Range by DSN Level</div>
+    <table class="dsn-table">
+      <thead><tr>
+        <th>DSN Level</th><th>Vessel Direct</th><th>Relay → DSN</th>${numRelays > 0 ? '<th>Chain Total</th>' : ''}
+      </tr></thead>
+      <tbody>
+        ${Object.entries(DSN_LEVELS).map(([name, lvlPow]) => {
+          const dr  = commnetRange(vesselPower, lvlPow);
+          const rds = commnetRange(relayPower, lvlPow);
+          const cr  = numRelays === 1 ? rds + vesselToRelayRange
+                    : numRelays > 1  ? rds + (numRelays-1)*relayRelayRange + vesselToRelayRange : 0;
+          const sel = name === dsnKey;
+          return `<tr class="${sel ? 'dsn-row-sel' : ''}">
+            <td>${name}${sel ? ' ◀' : ''}</td>
+            <td>${formatDistance(dr)}</td>
+            <td>${formatDistance(rds)}</td>
+            ${numRelays > 0 ? `<td>${formatDistance(cr)}</td>` : ''}
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <div class="result-grid" style="margin-top:8px">
       <div class="result-card accent">
         <div class="result-label">Vessel → Relay Range</div>
         <div class="result-value">${formatDistance(vesselToRelayRange)}</div>
       </div>
-      <div class="result-card accent">
-        <div class="result-label">Relay → DSN Range</div>
-        <div class="result-value">${formatDistance(relayToDsnRange)}</div>
-      </div>
       ${numRelays > 0 ? `<div class="result-card ok">
-        <div class="result-label">Relay Chain Total Range (${numRelays} relay${numRelays > 1 ? 's' : ''})</div>
+        <div class="result-label">Chain Total (${numRelays} relay${numRelays > 1 ? 's' : ''})</div>
         <div class="result-value">${formatDistance(chainRange)}</div>
       </div>` : ''}
     </div>
