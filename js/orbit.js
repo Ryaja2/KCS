@@ -2,15 +2,7 @@
 
 function initOrbit() {
   const bodySelect = document.getElementById('orb-body');
-  Object.entries(BODIES).forEach(([key, b]) => {
-    if (b.type !== 'star') {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = b.name;
-      if (key === 'kerbin') opt.selected = true;
-      bodySelect.appendChild(opt);
-    }
-  });
+  populateBodySelect(bodySelect, (key, b) => b.type !== 'star', 'kerbin');
   document.querySelectorAll('#tab-orbit input, #tab-orbit select').forEach(el => {
     el.addEventListener('input', calcOrbit);
   });

@@ -50,15 +50,7 @@ function syncConstellationAltPeriod(changedId) {
 function initConstellation() {
   const bodySelect = document.getElementById('con-body');
 
-  Object.entries(BODIES).forEach(([key, b]) => {
-    if (b.type === 'planet' || b.type === 'moon') {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = b.name;
-      if (key === 'kerbin') opt.selected = true;
-      bodySelect.appendChild(opt);
-    }
-  });
+  populateBodySelect(bodySelect, (key, b) => b.type === 'planet' || b.type === 'moon', 'kerbin');
 
   // Relay antenna dropdown (relay-capable antennas + Custom)
   const relayAntSelect = document.getElementById('con-relay-ant');

@@ -4,16 +4,10 @@ function initTransfer() {
   const depSelect = document.getElementById('trn-departure');
   const arrSelect = document.getElementById('trn-arrival');
 
-  KERBOL_PLANETS.forEach(key => {
-    const b = BODIES[key];
-    ['trn-departure', 'trn-arrival'].forEach(id => {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = b.name;
-      document.getElementById(id).appendChild(opt);
-    });
+  ['trn-departure', 'trn-arrival'].forEach(id => {
+    populateBodySelect(document.getElementById(id),
+      (key, b) => KERBOL_PLANETS.includes(key), null);
   });
-
   document.getElementById('trn-departure').value = 'kerbin';
   document.getElementById('trn-arrival').value = 'duna';
 

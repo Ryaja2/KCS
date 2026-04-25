@@ -160,3 +160,42 @@ function planetAngleAtUT(body, UT) {
 function kspUTFromFields(y, d, h, m, s) {
   return (y - 1) * 9203400 + (d - 1) * 21600 + h * 3600 + m * 60 + s;
 }
+
+// Populate a <select> with optgroup-nested body options.
+// filter(key, body) → true to include. defaultKey sets initial value.
+// Planets orbiting Kerbol go in "Kerbol System" group;
+// moons go in "[Planet] System" sub-groups below.
+function populateBodySelect(sel, filter, defaultKey) {
+  const moonsByParent = {};
+  Object.entries(BODIES).forEach(([key, b]) => {
+    if (!filter(key, b)) return;
+    if (b.parent && b.parent !== 'kerbol') {
+      (moonsByParent[b.parent] = moonsByParent[b.parent] || []).push(key);
+    }
+  });
+
+  const kerbolGroup = document.createElement('optgroup');
+  kerbolGroup.label = 'Kerbol System';
+  Object.entries(BODIES).forEach(([key, b]) => {
+    if (!filter(key, b) || b.parent !== 'kerbol') return;
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = b.name;
+    kerbolGroup.appendChild(opt);
+  });
+  if (kerbolGroup.children.length) sel.appendChild(kerbolGroup);
+
+  Object.entries(BODIES).forEach(([planetKey, planet]) => {
+    const moons = moonsByParent[planetKey];
+    if (!moons || !moons.length) return;
+    const group = document.createElement('optgroup');
+    group.label = `${planet.name} System`;
+    moons.forEach(moonKey => {
+      const opt = document.createElement('option');
+      opt.value = moonKey; opt.textContent = BODIES[moonKey].name;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
+  });
+
+  if (defaultKey) sel.value = defaultKey;
+}

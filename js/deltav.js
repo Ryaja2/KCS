@@ -2,15 +2,7 @@
 
 function initDeltaV() {
   const destSel = document.getElementById('dv-dest');
-  Object.entries(BODIES).forEach(([key, b]) => {
-    if (key === 'kerbol') return;
-    const opt = document.createElement('option');
-    opt.value = key;
-    const parentName = b.parent && b.parent !== 'kerbol' ? ` (moon of ${BODIES[b.parent].name})` : b.parent === 'kerbol' ? '' : '';
-    opt.textContent = b.name + parentName;
-    if (key === 'mun') opt.selected = true;
-    destSel.appendChild(opt);
-  });
+  populateBodySelect(destSel, (key, b) => key !== 'kerbol', 'mun');
 
   document.querySelectorAll('#tab-deltav input, #tab-deltav select').forEach(el => {
     el.addEventListener('input', () => { syncAerobrakeVisibility(); calcMissionDv(); });
