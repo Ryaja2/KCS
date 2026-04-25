@@ -30,6 +30,10 @@ function syncAerobrakeVisibility() {
     missionSel.value = 'orbit';
   }
 
+  if (isStar) {
+    document.getElementById('dv-dest-orb').value = 610;  // minimum safe orbit above Kerbol
+  }
+
   document.getElementById('dv-aerobrake-dest-row').style.display = hasAtm ? '' : 'none';
   document.getElementById('dv-dest-orb-row').style.display = missionSel.value === 'flyby' ? 'none' : '';
 }
