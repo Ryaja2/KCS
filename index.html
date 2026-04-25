@@ -56,6 +56,13 @@
             <div class="panel-body">
               <div class="instrument"><div class="instrument-label">Target Body</div><select id="con-body"></select></div>
               <div class="instrument"><div class="instrument-label">Satellites in Constellation</div><input type="number" id="con-numsats" value="3" min="2" max="24" /></div>
+              <div class="instrument">
+                <div class="instrument-label">Resonant Orbit Type</div>
+                <select id="con-resonant-type">
+                  <option value="inner" selected>Inner — Ap = target, Pe below (retrograde burn)</option>
+                  <option value="outer">Outer — Pe = target, Ap above (prograde burn)</option>
+                </select>
+              </div>
               <div class="instrument"><div class="instrument-label">Target Orbit Altitude (km)</div><input type="number" id="con-altitude" value="1000" min="1" step="10" /></div>
               <div class="instrument">
                 <div class="instrument-label" style="display:flex;align-items:center;gap:6px">

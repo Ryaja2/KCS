@@ -81,6 +81,7 @@ function initConstellation() {
   conDsnSelect.value = 'Level 3 (250T)';
 
   bodySelect.addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
+  document.getElementById('con-resonant-type').addEventListener('input', calcConstellation);
   document.getElementById('con-numsats').addEventListener('input', calcConstellation);
   document.getElementById('con-altitude').addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
   ['con-period-d','con-period-h','con-period-m','con-period-s'].forEach(id => {
@@ -112,22 +113,36 @@ function calcConstellation() {
   const minAlt   = minConstellationAltitude(body.radius, n);
   const losOK    = alt >= minAlt;
 
-  // Resonant deployment orbit — elliptical:
-  //   Ap = r_target (release/circularize point)
-  //   a_res = r_target × ((N-1)/N)^(2/3)
-  //   Pe = 2×a_res − Ap
-  const a_res    = resonantOrbitSMA(r_target, n);
-  const ap_res   = r_target;          // apoapsis at target altitude
-  const pe_res   = 2 * a_res - ap_res;
-  const ap_res_alt = altKm;           // same as target altitude
-  const pe_res_alt = (pe_res - body.radius) / 1000;
+  const resType = document.getElementById('con-resonant-type').value; // 'inner' | 'outer'
+
+  // Resonant deployment orbit
+  // Inner: Ap = r_target, Pe below — carrier slows, released sat lags behind
+  //   a = r_target × ((N-1)/N)^(2/3),  Pe = 2a − r_target
+  // Outer: Pe = r_target, Ap above — carrier speeds up, released sat gets ahead
+  //   a = r_target × (N/(N-1))^(2/3),  Ap = 2a − r_target
+  let a_res, ap_res, pe_res, ap_res_alt, pe_res_alt;
+  if (resType === 'outer') {
+    a_res       = r_target * Math.pow(n / (n - 1), 2/3);
+    pe_res      = r_target;
+    ap_res      = 2 * a_res - pe_res;
+    pe_res_alt  = altKm;
+    ap_res_alt  = (ap_res - body.radius) / 1000;
+  } else {
+    a_res       = resonantOrbitSMA(r_target, n);   // r_target × ((N-1)/N)^(2/3)
+    ap_res      = r_target;
+    pe_res      = 2 * a_res - ap_res;
+    ap_res_alt  = altKm;
+    pe_res_alt  = (pe_res - body.radius) / 1000;
+  }
 
   // Resonant period
   const T_res = orbitalPeriod(body.GM, a_res);
 
-  // ΔV to enter resonant orbit from circular at r_target (burn at Ap)
-  const v_ap_res    = velocityAtRadius(body.GM, ap_res, a_res);
-  const res_entry_dv = Math.abs(v_target - v_ap_res);
+  // ΔV to enter resonant orbit from circular at r_target
+  // Inner: burn retrograde at Ap (=r_target) to drop into lower Pe
+  // Outer: burn prograde  at Pe (=r_target) to raise into higher Ap
+  // Both cases: burn is always at r_target, formula is identical
+  const res_entry_dv = Math.abs(v_target - velocityAtRadius(body.GM, r_target, a_res));
 
   // Satellite spacing
   const spacing_deg = 360 / n;
@@ -187,17 +202,17 @@ function calcConstellation() {
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:14px">Resonant Deployment Orbit</div>
+      <div class="section-title" style="margin-top:14px">Resonant Deployment Orbit <span style="color:var(--amber);font-size:9px;letter-spacing:1px">${resType.toUpperCase()}</span></div>
       <div class="result-grid">
         <div class="result-card accent">
           <div class="result-label">Resonant Pe Altitude</div>
           <div class="result-value" style="font-size:22px">${pe_res_alt.toFixed(1)} km</div>
-          <div class="result-sub">retrograde burn from target alt</div>
+          <div class="result-sub">${resType === 'outer' ? 'equals target altitude' : 'below target — carrier drops here'}</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant Ap Altitude</div>
-          <div class="result-value" style="font-size:22px">${ap_res_alt.toFixed(0)} km</div>
-          <div class="result-sub">equals target altitude</div>
+          <div class="result-value" style="font-size:22px">${ap_res_alt.toFixed(1)} km</div>
+          <div class="result-sub">${resType === 'outer' ? 'above target — carrier rises here' : 'equals target altitude'}</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant SMA</div>
@@ -206,11 +221,12 @@ function calcConstellation() {
         <div class="result-card accent">
           <div class="result-label">Resonant Period</div>
           <div class="result-value">${formatKSPTime(T_res)}</div>
+          <div class="result-sub">${resType === 'outer' ? `${n}/${n-1} × target` : `${n-1}/${n} × target`}</div>
         </div>
         <div class="result-card ok">
           <div class="result-label">Entry ΔV (per release)</div>
           <div class="result-value">${res_entry_dv.toFixed(1)}</div>
-          <div class="result-sub">m/s retrograde / circularize each</div>
+          <div class="result-sub">m/s ${resType === 'outer' ? 'prograde' : 'retrograde'} at ${resType === 'outer' ? 'Pe' : 'Ap'} · reverse to circularize</div>
         </div>
         <div class="result-card">
           <div class="result-label">Total Deployment ΔV</div>
@@ -220,11 +236,17 @@ function calcConstellation() {
       </div>
 
       <div class="info-box">
-        <b>Deploy sequence:</b> Circularize at ${altKm.toFixed(0)} km → release sat #1 →
-        retrograde ${res_entry_dv.toFixed(1)} m/s to enter resonant orbit
-        (Pe ${pe_res_alt.toFixed(1)} km / Ap ${ap_res_alt.toFixed(0)} km) →
-        after 1 resonant period arrive back at Ap → prograde ${res_entry_dv.toFixed(1)} m/s →
-        release sat #2 → repeat ${n} times.
+        ${resType === 'outer'
+          ? `<b>Deploy sequence (outer):</b> Circularize at ${altKm.toFixed(0)} km → release sat #1 →
+             prograde ${res_entry_dv.toFixed(1)} m/s to enter resonant orbit
+             (Pe ${pe_res_alt.toFixed(1)} km / Ap ${ap_res_alt.toFixed(1)} km) →
+             after 1 resonant period arrive back at Pe → retrograde ${res_entry_dv.toFixed(1)} m/s to circularize →
+             release sat #2 → repeat ${n} times.`
+          : `<b>Deploy sequence (inner):</b> Circularize at ${altKm.toFixed(0)} km → release sat #1 →
+             retrograde ${res_entry_dv.toFixed(1)} m/s to enter resonant orbit
+             (Pe ${pe_res_alt.toFixed(1)} km / Ap ${ap_res_alt.toFixed(1)} km) →
+             after 1 resonant period arrive back at Ap → prograde ${res_entry_dv.toFixed(1)} m/s to circularize →
+             release sat #2 → repeat ${n} times.`}
       </div>
 
       <div class="section-title" style="margin-top:14px">CommNet Link Analysis</div>
