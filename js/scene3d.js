@@ -419,7 +419,37 @@ function updateMission3D({ destKey, lkoAlt }) {
   const dest   = BODIES[destKey];
   const kerbin = BODIES.kerbin;
 
-  if (dest.parent === 'kerbin') {
+  if (destKey === 'kerbol') {
+    // ── Solar approach ──
+    const maxR  = kerbin.SMA;
+    const scale = 5.0 / maxR;
+
+    // Kerbol — large glowing sun at center
+    const sunR = Math.max(BODIES.kerbol.radius * scale, 0.4);
+    sc.add(makeSphere(sunR, 0xffa500, 0.35, 24));
+    sc.add(makeSolidSphere(sunR * 1.1, 0xffa500, 0.18));
+    sc.add(makeAtmosphere(sunR * 1.25, 0xffa500, 0.1));
+
+    // Kerbin orbit
+    sc.add(makeCircle(kerbin.SMA * scale, 128, hexInt(kerbin.color), 0.5));
+
+    // Transfer ellipse: Pe near Kerbol surface, Ap at Kerbin's orbit
+    const pe_t = (BODIES.kerbol.radius + lkoAlt) * scale;
+    const ap_t = kerbin.SMA * scale;
+    sc.add(makeEllipse(pe_t, ap_t, 256, 0x00d4ff, 0.65));
+
+    // Departure dot at Ap (Kerbin's orbit)
+    const depDot = makeDot(0.12, hexInt(kerbin.color));
+    depDot.position.set(-ap_t, 0, 0);
+    sc.add(depDot);
+    sc.add(makeArrow([-ap_t, 0, 0], [-ap_t, 0, -0.55], 0x2aff6f));
+
+    sc.add(makeCircle(ap_t * 1.25, 64, 0x0a1828, 0.35));
+
+    sc.controls.maxDistance = ap_t * 3;
+    sc.controls.minDistance = 0.2;
+
+  } else if (dest.parent === 'kerbin') {
     // ── Kerbin system ──
     const r_world = 2.0;
     const scale   = r_world / kerbin.radius;
