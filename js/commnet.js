@@ -101,6 +101,11 @@ function calcCommNet() {
   }
 
   document.getElementById('cn-results').innerHTML = `
+    <div class="panel-header">
+      <span class="panel-header-text">CommNet Analysis</span>
+      <span class="panel-header-led"></span>
+    </div>
+    <div class="panel-body">
     <div class="section-title">Antenna Powers</div>
     <div class="result-grid">
       <div class="result-card">
@@ -149,9 +154,12 @@ function calcCommNet() {
       Combinability multiplies antenna powers within a vessel.
       Relay antennas can forward signals; probe cores require direct or relay path to KSC.
     </div>
+    </div>
   `;
 
-  drawCommNetViz(directRange, vesselToRelayRange, relayToDsnRange, distKm, numRelays, chainRange);
+  if (window.updateCommNet3D) {
+    updateCommNet3D({ directRange, v2r: vesselToRelayRange, r2d: relayToDsnRange, numRelays, chainRange, dist: distKm });
+  }
 }
 
 function drawCommNetViz(directRange, v2r, r2d, dist, numRelays, chainRange) {

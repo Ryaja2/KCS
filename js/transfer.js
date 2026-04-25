@@ -74,6 +74,11 @@ function calcTransfer() {
   const dirLabel = outward ? 'prograde' : 'retrograde';
 
   document.getElementById('trn-results').innerHTML = `
+    <div class="panel-header">
+      <span class="panel-header-text">Transfer — ${dep.name} → ${arr.name}</span>
+      <span class="panel-header-led" style="background:var(--amber);box-shadow:0 0 6px var(--amber-glow)"></span>
+    </div>
+    <div class="panel-body">
     <div class="result-grid">
       <div class="result-card accent">
         <div class="result-label">Ejection Burn (${dep.name})</div>
@@ -127,6 +132,7 @@ function calcTransfer() {
     <div class="info-box">
       <b>Note:</b> Ejection/capture burns include Oberth effect from ${(depAlt/1000).toFixed(0)} km / ${(arrAlt/1000).toFixed(0)} km parking orbits.
       Assumes circular, coplanar orbits. Inclination corrections add ΔV.
+    </div>
     </div>
   `;
 

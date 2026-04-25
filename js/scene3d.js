@@ -369,6 +369,203 @@ function updateTransfer3D({ depKey, arrKey, r1, r2, a_transfer }) {
   sc.controls.minDistance = 0.5;
 }
 
+// ── MISSION ΔV 3D ─────────────────────────────────────────
+
+function updateMission3D({ destKey, lkoAlt }) {
+  const sc = getOrCreateScene('dv-canvas', [0, 3, 8]);
+  if (!sc) return;
+  sc.clearItems();
+
+  const dest   = BODIES[destKey];
+  const kerbin = BODIES.kerbin;
+
+  if (dest.parent === 'kerbin') {
+    // ── Kerbin system ──
+    const r_world = 2.0;
+    const scale   = r_world / kerbin.radius;
+    const kColor  = hexInt(kerbin.color);
+    const dColor  = hexInt(dest.color);
+
+    sc.add(makeSphere(r_world, kColor, 0.22));
+    sc.add(makeSolidSphere(r_world * 1.03, kColor, 0.07));
+    if (kerbin.atmosphere) {
+      sc.add(makeSolidSphere((kerbin.radius + kerbin.atmosphere.height) * scale, kColor, 0.04));
+    }
+
+    // LKO ring (faint)
+    const lko_w = (kerbin.radius + lkoAlt) * scale;
+    sc.add(makeCircle(lko_w, 64, 0x225533, 0.4));
+
+    // Moon orbit
+    const moonOrb_w = dest.SMA * scale;
+    sc.add(makeCircle(moonOrb_w, 128, dColor, 0.5));
+
+    // Transfer ellipse (LKO → moon)
+    const a_tr_w   = (lko_w + moonOrb_w) / 2;
+    const transLine = makeEllipse(lko_w, moonOrb_w, 256, 0x00d4ff, 0.65);
+    sc.add(transLine);
+
+    // Moon dot
+    const moonDot = makeDot(Math.max(dest.radius * scale, 0.18), dColor);
+    moonDot.position.set(-moonOrb_w, 0, 0);
+    sc.add(moonDot);
+
+    // ΔV arrow at departure (Pe of transfer)
+    sc.add(makeArrow([lko_w, 0, 0], [lko_w, 0, 0.5], 0x2aff6f));
+
+    sc.controls.maxDistance = moonOrb_w * 3;
+    sc.controls.minDistance = r_world * 1.2;
+
+  } else if (dest.parent === 'kerbol') {
+    // ── Interplanetary ──
+    const maxR  = Math.max(kerbin.SMA, dest.SMA);
+    const scale = 5.0 / maxR;
+    const outward = dest.SMA > kerbin.SMA;
+
+    sc.add(makeDot(0.28, 0xffa500));
+    sc.add(makeSolidSphere(0.55, 0xffa500, 0.12));
+
+    sc.add(makeCircle(kerbin.SMA * scale, 128, hexInt(kerbin.color), 0.5));
+    sc.add(makeCircle(dest.SMA   * scale, 128, hexInt(dest.color),   0.5));
+
+    // Transfer ellipse
+    const pe_t = Math.min(kerbin.SMA, dest.SMA) * scale;
+    const ap_t = Math.max(kerbin.SMA, dest.SMA) * scale;
+    sc.add(makeEllipse(pe_t, ap_t, 256, 0x00d4ff, 0.7));
+
+    // Departure dot (at Pe of transfer)
+    const depDot = makeDot(0.12, hexInt(kerbin.color));
+    depDot.position.set(pe_t, 0, 0);
+    sc.add(depDot);
+    sc.add(makeArrow([pe_t, 0, 0], [pe_t, 0, outward ? 0.55 : -0.55], 0x2aff6f));
+
+    // Arrival dot (at Ap of transfer)
+    const arrDot = makeDot(0.15, hexInt(dest.color));
+    arrDot.position.set(-ap_t, 0, 0);
+    sc.add(arrDot);
+    sc.add(makeArrow([-ap_t, 0, 0], [-ap_t, 0, outward ? -0.45 : 0.45], 0xff8844));
+
+    sc.add(makeCircle(ap_t * 1.25, 64, 0x0a1828, 0.35));
+
+    sc.controls.maxDistance = ap_t * 3;
+    sc.controls.minDistance = 0.3;
+
+  } else if (dest.parent && BODIES[dest.parent]) {
+    // ── Moon of another planet ──
+    const parent = BODIES[dest.parent];
+    const maxR   = Math.max(kerbin.SMA, parent.SMA);
+    const scale  = 5.0 / maxR;
+
+    sc.add(makeDot(0.28, 0xffa500));
+    sc.add(makeSolidSphere(0.55, 0xffa500, 0.12));
+
+    sc.add(makeCircle(kerbin.SMA * scale, 128, hexInt(kerbin.color), 0.4));
+    sc.add(makeCircle(parent.SMA * scale, 128, hexInt(parent.color), 0.55));
+
+    // Transfer ellipse Kerbin→parent
+    const pe_t = Math.min(kerbin.SMA, parent.SMA) * scale;
+    const ap_t = Math.max(kerbin.SMA, parent.SMA) * scale;
+    sc.add(makeEllipse(pe_t, ap_t, 256, 0x00d4ff, 0.6));
+
+    // Parent dot
+    const parDot = makeDot(0.2, hexInt(parent.color));
+    parDot.position.set(-ap_t, 0, 0);
+    sc.add(parDot);
+
+    // Moon ring around parent (translated group via position hack)
+    const moonR_w = dest.SMA * scale;
+    const moonRing = makeCircle(moonR_w, 96, hexInt(dest.color), 0.45);
+    moonRing.position.set(-ap_t, 0, 0);
+    sc.add(moonRing);
+
+    sc.controls.maxDistance = ap_t * 3;
+    sc.controls.minDistance = 0.3;
+  }
+}
+
+// ── COMMNET 3D ─────────────────────────────────────────────
+
+function updateCommNet3D({ directRange, v2r, r2d, numRelays, chainRange, dist }) {
+  const sc = getOrCreateScene('cn-canvas', [0, 2.5, 10]);
+  if (!sc) return;
+  sc.clearItems();
+
+  // World scale: directRange maps to 8 units
+  const scale = 8 / directRange;
+  const kscX  = -4;
+
+  // Inward vessel position: either at actual dist or at 80% of direct range for illustration
+  const vesWorldX = dist > 0 ? Math.min(dist * scale + kscX, 8) : kscX + 8;
+
+  // KSC sphere (green)
+  const kscDot = makeDot(0.25, 0x2aff6f);
+  kscDot.position.set(kscX, 0, 0);
+  sc.add(kscDot);
+
+  // KSC range sphere (faint wireframe)
+  const dRW = directRange * scale;
+  if (dRW < 80) {
+    const rangeSphere = makeSphere(dRW, 0x2aff6f, 0.06, 14);
+    rangeSphere.position.set(kscX, 0, 0);
+    sc.add(rangeSphere);
+  }
+
+  // Vessel (cyan)
+  const vesDot = makeDot(0.18, 0x00d4ff);
+  vesDot.position.set(vesWorldX, 0, 0);
+  sc.add(vesDot);
+  // Vessel solar panels
+  sc.add(makeArrow([vesWorldX - 0.4, 0, 0], [vesWorldX + 0.4, 0, 0], 0x00d4ff));
+
+  // Direct link line
+  const inDirectRange = dist > 0 && dist <= directRange;
+  const lineColor = inDirectRange ? 0x2aff6f : 0x224455;
+  const pts = [new THREE.Vector3(kscX, 0, 0), new THREE.Vector3(vesWorldX, 0, 0)];
+  const geo  = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat  = new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: inDirectRange ? 0.8 : 0.3 });
+  sc.add(new THREE.Line(geo, mat));
+
+  // Relay chain
+  if (numRelays > 0) {
+    const relayV2R = v2r * scale;
+    for (let i = 1; i <= numRelays; i++) {
+      const rx = kscX + (vesWorldX - kscX) * (i / (numRelays + 1));
+      const relayDot = makeDot(0.14, 0xffb300);
+      relayDot.position.set(rx, 0, 0);
+      sc.add(relayDot);
+      // Solar panel wings
+      sc.add(makeArrow([rx - 0.3, 0, 0], [rx + 0.3, 0, 0], 0xffb300));
+      // Relay range sphere
+      const hopR = Math.min(relayV2R, r2d * scale) * 0.5;
+      if (hopR < 40) {
+        const rSphere = makeSphere(hopR, 0xffb300, 0.05, 10);
+        rSphere.position.set(rx, 0, 0);
+        sc.add(rSphere);
+      }
+    }
+    // Chain line in amber
+    const cPts = [];
+    for (let i = 0; i <= numRelays + 1; i++) {
+      const x = kscX + (vesWorldX - kscX) * (i / (numRelays + 1));
+      cPts.push(new THREE.Vector3(x, 0, 0));
+    }
+    const cGeo = new THREE.BufferGeometry().setFromPoints(cPts);
+    const cMat = new THREE.LineBasicMaterial({ color: 0xffb300, transparent: true, opacity: 0.6 });
+    sc.add(new THREE.Line(cGeo, cMat));
+  }
+
+  // Distance marker vertical line
+  if (dist > 0) {
+    const dx = dist * scale + kscX;
+    if (Math.abs(dx) < 20) {
+      sc.add(makeArrow([dx, -0.5, 0], [dx, 1.5, 0], 0xff8844));
+    }
+  }
+
+  sc.controls.maxDistance = 25;
+  sc.controls.minDistance = 0.5;
+}
+
 // ── resize helper ──────────────────────────────────────────
 function resize3DCanvas(canvasId) {
   const sc = scenes3d[canvasId];

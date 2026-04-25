@@ -41,10 +41,19 @@
 
 /* ─── RESET ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; background: var(--m0); color: var(--tx); font-family: var(--f-body); font-size: 14px; overflow-x: hidden; }
+html, body {
+  height: 100%;
+  background-color: #040609;
+  background-image:
+    repeating-linear-gradient(0deg,   rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 36px),
+    repeating-linear-gradient(90deg,  rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 36px),
+    repeating-linear-gradient(135deg, rgba(255,255,255,0.004) 0px, rgba(255,255,255,0.004) 1px, transparent 1px, transparent 5px),
+    linear-gradient(160deg, #07101c 0%, #040609 45%, #060e18 100%);
+  color: var(--tx); font-family: var(--f-body); font-size: 14px; overflow-x: hidden;
+}
 
 /* ─── STARS ─────────────────────────────────────────── */
-#stars-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.5; }
+#stars-canvas { display: none; }
 
 /* ─── APP ────────────────────────────────────────────── */
 #app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
@@ -151,7 +160,7 @@ main { flex: 1; padding: 20px; max-width: 1350px; width: 100%; margin: 0 auto; }
 .calc-layout {
   display: grid;
   grid-template-columns: 290px 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto;
   gap: 14px;
 }
 @media (max-width: 920px) { .calc-layout { grid-template-columns: 1fr; } }
@@ -172,7 +181,6 @@ main { flex: 1; padding: 20px; max-width: 1350px; width: 100%; margin: 0 auto; }
   border-right: 2px solid var(--m0);
   border-bottom: 2px solid var(--m0);
   box-shadow: 4px 4px 14px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.04);
-  overflow: hidden;
 }
 
 .panel-header {

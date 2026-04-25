@@ -12,20 +12,6 @@ function updateClock() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Background starfield
-  const starsEl = document.getElementById('stars-canvas');
-  if (starsEl) {
-    const ctx = starsEl.getContext('2d');
-    const resize = () => {
-      starsEl.width  = window.innerWidth;
-      starsEl.height = window.innerHeight;
-      clearCanvas(ctx, starsEl);
-      drawStars(ctx, starsEl, 220, 42);
-    };
-    resize();
-    window.addEventListener('resize', resize);
-  }
-
   // Mission clock
   updateClock();
   setInterval(updateClock, 1000);
@@ -40,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sync canvas sizes for 3D scenes when tab becomes visible
     requestAnimationFrame(() => {
-      ['con-canvas','trn-canvas','orb-canvas'].forEach(resize3DCanvas);
+      ['con-canvas','trn-canvas','orb-canvas','dv-canvas','cn-canvas'].forEach(resize3DCanvas);
 
       if (id === 'constellation') calcConstellation();
       if (id === 'transfer')      calcTransfer();
@@ -59,26 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initOrbit();
   initCommNet();
 
-  // Resize 2D canvases (dv + commnet)
-  function resize2DCanvases() {
-    ['dv-canvas','cn-canvas'].forEach(id => {
-      const canvas = document.getElementById(id);
-      if (!canvas) return;
-      const w = canvas.parentElement.clientWidth;
-      if (w > 0 && canvas.width !== w) {
-        canvas.width  = w;
-        canvas.height = Math.min(Math.round(w * 0.52), 360);
-      }
-    });
-  }
-
   window.addEventListener('resize', () => {
-    resize2DCanvases();
-    ['con-canvas','trn-canvas','orb-canvas'].forEach(resize3DCanvas);
+    ['con-canvas','trn-canvas','orb-canvas','dv-canvas','cn-canvas'].forEach(resize3DCanvas);
     const active = document.querySelector('.ctrl-btn.active');
     if (active) showTab(active.dataset.tab);
   });
 
-  resize2DCanvases();
   showTab('constellation');
 });

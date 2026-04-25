@@ -29,86 +29,49 @@ function calcOrbit() {
   const ap = body.radius + apAlt;
 
   if (ap < pe) {
-    document.getElementById('orb-results').innerHTML = '<div class="warn-text">Apoapsis must be ≥ periapsis.</div>';
+    document.getElementById('orb-results').innerHTML = '<div class="panel-body"><div class="warn-text">Apoapsis must be ≥ periapsis.</div></div>';
     return;
   }
 
-  const sma = (pe + ap) / 2;
-  const ecc = (ap - pe) / (ap + pe);
-  const T   = orbitalPeriod(body.GM, sma);
-  const v_pe = velocityAtRadius(body.GM, pe, sma);
-  const v_ap = velocityAtRadius(body.GM, ap, sma);
-  const e_spec = -body.GM / (2 * sma); // specific orbital energy
-  const inclination = 0; // user not setting inclination here
-
-  // Circular orbit at same SMA for comparison
+  const sma    = (pe + ap) / 2;
+  const ecc    = (ap - pe) / (ap + pe);
+  const T      = orbitalPeriod(body.GM, sma);
+  const v_pe   = velocityAtRadius(body.GM, pe, sma);
+  const v_ap   = velocityAtRadius(body.GM, ap, sma);
+  const e_spec = -body.GM / (2 * sma);
   const v_circ = circularVelocity(body.GM, sma);
+  const soiOK  = ap <= body.SOI;
 
-  // SOI check
-  const soiOK = ap <= body.SOI;
+  const eccLabel = ecc < 0.001 ? 'Nearly circular' : ecc < 0.1 ? 'Low eccentricity' : ecc < 0.9 ? 'Elliptical' : 'Highly elliptical';
+  const soiStr   = soiOK ? '✓ Within SOI' : '✗ Exceeds SOI (' + formatDistance(body.SOI) + ')';
 
-  document.getElementById('orb-results').innerHTML = `
-    <div class="result-grid">
-      <div class="result-card${soiOK ? '' : ' warn'}">
-        <div class="result-label">SOI Check</div>
-        <div class="result-value" style="color:${soiOK ? '#00ff88' : '#ff4444'}">
-          ${soiOK ? '✓ Within SOI' : '✗ Exceeds SOI ('+formatDistance(body.SOI)+')'}
-        </div>
-      </div>
-      <div class="result-card accent">
-        <div class="result-label">Semi-Major Axis</div>
-        <div class="result-value">${formatDistance(sma)}</div>
-      </div>
-      <div class="result-card accent">
-        <div class="result-label">Eccentricity</div>
-        <div class="result-value">${ecc.toFixed(6)}</div>
-        <div class="result-sub">${ecc < 0.001 ? 'Nearly circular' : ecc < 0.1 ? 'Low eccentricity' : ecc < 0.9 ? 'Elliptical' : 'Highly elliptical'}</div>
-      </div>
-      <div class="result-card ok">
-        <div class="result-label">Orbital Period</div>
-        <div class="result-value">${formatKSPTime(T)}</div>
-      </div>
-      <div class="result-card">
-        <div class="result-label">Velocity at Pe</div>
-        <div class="result-value">${v_pe.toFixed(2)} m/s</div>
-        <div class="result-sub">Pe alt: ${(peAlt/1000).toFixed(2)} km</div>
-      </div>
-      <div class="result-card">
-        <div class="result-label">Velocity at Ap</div>
-        <div class="result-value">${v_ap.toFixed(2)} m/s</div>
-        <div class="result-sub">Ap alt: ${(apAlt/1000).toFixed(2)} km</div>
-      </div>
-      <div class="result-card">
-        <div class="result-label">Circular Velocity (SMA)</div>
-        <div class="result-value">${v_circ.toFixed(2)} m/s</div>
-      </div>
-      <div class="result-card">
-        <div class="result-label">Specific Orbital Energy</div>
-        <div class="result-value">${(e_spec/1000).toFixed(2)} kJ/kg</div>
-      </div>
-    </div>
-    <div class="section-title" style="margin-top:16px">Body Reference</div>
-    <div class="result-grid">
-      <div class="result-card">
-        <div class="result-label">Surface Gravity</div>
-        <div class="result-value">${(body.GM / body.radius / body.radius).toFixed(3)} m/s²</div>
-      </div>
-      <div class="result-card">
-        <div class="result-label">Escape Velocity</div>
-        <div class="result-value">${Math.sqrt(2 * body.GM / body.radius).toFixed(1)} m/s</div>
-        <div class="result-sub">from surface</div>
-      </div>
-      ${body.atmosphere ? `
-      <div class="result-card">
-        <div class="result-label">Atmosphere Top</div>
-        <div class="result-value">${(body.atmosphere.height/1000).toFixed(0)} km</div>
-      </div>` : ''}
-      <div class="result-card">
-        <div class="result-label">SOI Radius</div>
-        <div class="result-value">${body.SOI === Infinity ? '∞' : formatDistance(body.SOI)}</div>
-      </div>
-    </div>
-  `;
+  document.getElementById('orb-results').innerHTML =
+    '<div class="panel-header">' +
+      '<span class="panel-header-text">Orbital Parameters — ' + body.name + '</span>' +
+      '<span class="panel-header-led"></span>' +
+    '</div>' +
+    '<div class="panel-body">' +
+    '<div class="result-grid">' +
+      '<div class="result-card' + (soiOK ? '' : ' warn') + '">' +
+        '<div class="result-label">SOI Check</div>' +
+        '<div class="result-value" style="color:' + (soiOK ? '#00ff88' : '#ff4444') + '">' + soiStr + '</div>' +
+      '</div>' +
+      '<div class="result-card accent"><div class="result-label">Semi-Major Axis</div><div class="result-value">' + formatDistance(sma) + '</div></div>' +
+      '<div class="result-card accent"><div class="result-label">Eccentricity</div><div class="result-value">' + ecc.toFixed(6) + '</div><div class="result-sub">' + eccLabel + '</div></div>' +
+      '<div class="result-card ok"><div class="result-label">Orbital Period</div><div class="result-value">' + formatKSPTime(T) + '</div></div>' +
+      '<div class="result-card"><div class="result-label">Velocity at Pe</div><div class="result-value">' + v_pe.toFixed(2) + ' m/s</div><div class="result-sub">Pe alt: ' + (peAlt/1000).toFixed(2) + ' km</div></div>' +
+      '<div class="result-card"><div class="result-label">Velocity at Ap</div><div class="result-value">' + v_ap.toFixed(2) + ' m/s</div><div class="result-sub">Ap alt: ' + (apAlt/1000).toFixed(2) + ' km</div></div>' +
+      '<div class="result-card"><div class="result-label">Circular Velocity (SMA)</div><div class="result-value">' + v_circ.toFixed(2) + ' m/s</div></div>' +
+      '<div class="result-card"><div class="result-label">Specific Orbital Energy</div><div class="result-value">' + (e_spec/1000).toFixed(2) + ' kJ/kg</div></div>' +
+    '</div>' +
+    '<div class="section-title" style="margin-top:16px">Body Reference</div>' +
+    '<div class="result-grid">' +
+      '<div class="result-card"><div class="result-label">Surface Gravity</div><div class="result-value">' + (body.GM / body.radius / body.radius).toFixed(3) + ' m/s²</div></div>' +
+      '<div class="result-card"><div class="result-label">Escape Velocity</div><div class="result-value">' + Math.sqrt(2 * body.GM / body.radius).toFixed(1) + ' m/s</div><div class="result-sub">from surface</div></div>' +
+      (body.atmosphere ? '<div class="result-card"><div class="result-label">Atmosphere Top</div><div class="result-value">' + (body.atmosphere.height/1000).toFixed(0) + ' km</div></div>' : '') +
+      '<div class="result-card"><div class="result-label">SOI Radius</div><div class="result-value">' + (body.SOI === Infinity ? '∞' : formatDistance(body.SOI)) + '</div></div>' +
+    '</div>' +
+    '</div>';
 
   if (window.updateOrbit3D) {
     updateOrbit3D({ bodyKey, peAlt, apAlt });

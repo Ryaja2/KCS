@@ -262,7 +262,9 @@ function calcMissionDv() {
     </div>
   `;
 
-  drawDvViz(phases, total);
+  if (window.updateMission3D) {
+    updateMission3D({ destKey, lkoAlt });
+  }
 }
 
 function drawDvViz(phases, total) {
