@@ -636,3 +636,169 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
   input[type="number"], select { min-height: 40px; }
   input[type="checkbox"] { width: 18px; height: 18px; }
 }
+
+/* ═══════════════════════════════════════════════════════
+   SETTINGS GEAR BUTTON
+═══════════════════════════════════════════════════════ */
+.settings-btn {
+  position: fixed; top: 14px; right: 16px; z-index: 400;
+  width: 34px; height: 34px;
+  background: var(--m2); border: 1px solid var(--m5); border-radius: 4px;
+  color: var(--tx-mid); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 7px;
+  transition: color .15s, border-color .15s, box-shadow .15s, transform .2s;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+}
+.settings-btn:hover { color: var(--amber); border-color: var(--amber); box-shadow: 0 0 10px var(--amber-glow); }
+.settings-btn svg { width: 100%; height: 100%; }
+.settings-panel.open ~ #app .settings-btn,
+.settings-btn.panel-open { transform: rotate(45deg); }
+
+/* ═══════════════════════════════════════════════════════
+   SETTINGS PANEL
+═══════════════════════════════════════════════════════ */
+.settings-panel {
+  position: fixed; top: 0; right: 0;
+  width: 300px; height: 100vh;
+  background: linear-gradient(160deg, var(--m3) 0%, var(--m1) 100%);
+  border-left: 1px solid var(--m5);
+  box-shadow: -6px 0 32px rgba(0,0,0,0.85);
+  z-index: 350;
+  transform: translateX(100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto; display: flex; flex-direction: column;
+}
+.settings-panel.open { transform: translateX(0); }
+
+.settings-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--m4);
+  background: var(--m2);
+  position: sticky; top: 0; z-index: 10;
+}
+.settings-title {
+  font-family: var(--f-ui); font-size: 9px; font-weight: 700;
+  letter-spacing: 4px; color: var(--amber); text-shadow: 0 0 12px var(--amber-glow);
+  line-height: 1.5; padding-top: 2px;
+}
+.settings-close {
+  background: none; border: none; color: var(--tx-mid);
+  font-size: 16px; cursor: pointer; padding: 2px 6px; line-height: 1;
+  transition: color .15s; border-radius: 3px;
+}
+.settings-close:hover { color: var(--red); }
+
+.settings-section {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--m3);
+}
+.settings-section-label {
+  font-family: var(--f-ui); font-size: 7px; font-weight: 700;
+  letter-spacing: 3px; color: var(--tx-dim); text-transform: uppercase;
+  margin-bottom: 12px; line-height: 1.5; padding-top: 2px;
+}
+
+/* ── Theme grid ── */
+.theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.theme-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px;
+  background: var(--m1); border: 1px solid var(--m4); border-radius: 3px;
+  cursor: pointer; font-family: var(--f-body); font-size: 12px; color: var(--tx-mid);
+  transition: border-color .15s, color .15s, box-shadow .15s; text-align: left;
+}
+.theme-btn:hover { border-color: var(--m6); color: var(--tx); }
+.theme-btn.active { border-color: var(--amber); color: var(--amber); box-shadow: 0 0 8px var(--amber-wide); }
+.theme-swatch {
+  width: 20px; height: 20px; border-radius: 3px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* ── Toggle switch ── */
+.settings-toggle-row {
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; padding: 4px 0; user-select: none;
+}
+.settings-toggle-label { flex: 1; font-family: var(--f-body); font-size: 12px; color: var(--tx); }
+.settings-toggle-row input[type="checkbox"] { display: none; }
+.settings-toggle-track {
+  width: 38px; height: 21px; background: var(--m0);
+  border: 1px solid var(--m5); border-radius: 11px;
+  position: relative; flex-shrink: 0;
+  transition: background .2s, border-color .2s, box-shadow .2s;
+}
+.settings-toggle-row input:checked + .settings-toggle-track {
+  background: rgba(0,212,255,0.12);
+  border-color: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+.settings-toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--m5); transition: transform .2s, background .2s;
+}
+.settings-toggle-row input:checked + .settings-toggle-track .settings-toggle-thumb {
+  transform: translateX(17px); background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan-glow);
+}
+.settings-hint {
+  font-family: var(--f-body); font-size: 9px; color: var(--tx-dim);
+  line-height: 1.6; margin-top: 8px;
+}
+
+/* ── Licenses ── */
+.settings-section-licenses { flex: 1; }
+.license-list { display: flex; flex-direction: column; gap: 6px; }
+.license-item {
+  padding: 8px 10px; background: var(--m0);
+  border: 1px solid var(--m3); border-radius: 3px;
+}
+.license-name { font-family: var(--f-body); font-size: 11px; color: var(--tx); margin-bottom: 2px; }
+.license-detail { font-family: var(--f-body); font-size: 9px; color: var(--tx-dim); line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════════════
+   THEMES
+═══════════════════════════════════════════════════════ */
+
+/* ── Duna (rust/red) ── */
+body[data-theme="duna"] {
+  --amber:      #ff7733;
+  --amber-glow: rgba(255,119,51,0.6);
+  --amber-wide: rgba(255,119,51,0.12);
+  --cyan:       #ff4422;
+  --cyan-glow:  rgba(255,68,34,0.5);
+  --cyan-wide:  rgba(255,68,34,0.08);
+  --green:      #ffaa44;
+  --green-glow: rgba(255,170,68,0.55);
+  --m0: #0d0402; --m1: #160806; --m2: #1e0e0a;
+  --m3: #2a1610; --m4: #381e16; --m5: #4a2820; --m6: #5e3428;
+}
+
+/* ── Jool (acid green) ── */
+body[data-theme="jool"] {
+  --amber:      #88ff44;
+  --amber-glow: rgba(136,255,68,0.6);
+  --amber-wide: rgba(136,255,68,0.12);
+  --cyan:       #44ff88;
+  --cyan-glow:  rgba(68,255,136,0.5);
+  --cyan-wide:  rgba(68,255,136,0.08);
+  --green:      #ccff44;
+  --green-glow: rgba(204,255,68,0.55);
+  --m0: #030803; --m1: #060e06; --m2: #0a150a;
+  --m3: #101e10; --m4: #162816; --m5: #1e3620; --m6: #284428;
+}
+
+/* ── Kerbol (solar orange) ── */
+body[data-theme="kerbol"] {
+  --amber:      #ffcc00;
+  --amber-glow: rgba(255,204,0,0.6);
+  --amber-wide: rgba(255,204,0,0.12);
+  --cyan:       #ff9900;
+  --cyan-glow:  rgba(255,153,0,0.5);
+  --cyan-wide:  rgba(255,153,0,0.08);
+  --green:      #ffee44;
+  --green-glow: rgba(255,238,68,0.55);
+  --m0: #060400; --m1: #0e0800; --m2: #180e00;
+  --m3: #221400; --m4: #2e1c00; --m5: #3c2800; --m6: #4e3800;
+}

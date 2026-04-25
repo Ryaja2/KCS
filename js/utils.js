@@ -203,3 +203,21 @@ function populateBodySelect(sel, filter, defaultKey) {
 
   if (defaultKey) sel.value = defaultKey;
 }
+
+// Rebuild all body selects after BODIES changes (OPM toggle)
+function rebuildBodySelects() {
+  const specs = [
+    { id: 'con-body',      filter: (k,b) => b.type==='planet'||b.type==='moon', def: 'kerbin' },
+    { id: 'orb-body',      filter: () => true,                                  def: 'kerbin' },
+    { id: 'dv-dest',       filter: () => true,                                  def: 'mun'    },
+    { id: 'trn-departure', filter: (k,b) => b.parent==='kerbol'&&b.type==='planet', def: 'kerbin' },
+    { id: 'trn-arrival',   filter: (k,b) => b.parent==='kerbol'&&b.type==='planet', def: 'duna'   },
+  ];
+  specs.forEach(({ id, filter, def }) => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '';
+    populateBodySelect(sel, filter, BODIES[cur] ? cur : def);
+  });
+}

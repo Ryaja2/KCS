@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   navBtns.forEach(btn => btn.addEventListener('click', () => showTab(btn.dataset.tab)));
 
+  // Initialize settings panel
+  initSettings();
+
   // Initialize calculators
   initConstellation();
   initTransfer();

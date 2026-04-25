@@ -109,3 +109,77 @@ const DSN_LEVELS = {
 
 // Planet bodies that orbit Kerbol (for transfer calculator)
 const KERBOL_PLANETS = ['moho','eve','kerbin','duna','dres','jool','eeloo'];
+
+// Outer Planets Mod bodies — merged into BODIES when OPM is enabled
+const OPM_BODIES = {
+  sarnus: {
+    name: 'Sarnus', type: 'planet', GM: 8.3558e13, radius: 5300000,
+    SOI: 7565719701, SMA: 125354319282, eccentricity: 0.056, inclination: 2.02,
+    color: '#c8a87a', parent: 'kerbol', atmosphere: { height: 560000, pressure: 151988 }, epochMA: 0.0
+  },
+  hale: {
+    name: 'Hale', type: 'moon', GM: 2570321, radius: 6000,
+    SOI: 42702, SMA: 65334233, eccentricity: 0.0, inclination: 0.0,
+    color: '#888888', parent: 'sarnus', atmosphere: null
+  },
+  ovok: {
+    name: 'Ovok', type: 'moon', GM: 192000000, radius: 26000,
+    SOI: 239736, SMA: 70117421, eccentricity: 0.0, inclination: 0.0,
+    color: '#a09080', parent: 'sarnus', atmosphere: null
+  },
+  slate: {
+    name: 'Slate', type: 'moon', GM: 3.277e11, radius: 540000,
+    SOI: 2999693, SMA: 272365890, eccentricity: 0.0, inclination: 0.0,
+    color: '#607080', parent: 'sarnus', atmosphere: null
+  },
+  tekto: {
+    name: 'Tekto', type: 'moon', GM: 2.492e10, radius: 280000,
+    SOI: 1154433, SMA: 1400000000, eccentricity: 0.02, inclination: 8.5,
+    color: '#e8a050', parent: 'sarnus', atmosphere: { height: 95000, pressure: 101325 }
+  },
+  urlum: {
+    name: 'Urlum', type: 'planet', GM: 8.5397e12, radius: 1600000,
+    SOI: 4278547531, SMA: 254463421215, eccentricity: 0.012, inclination: 3.1,
+    color: '#b3e8e8', parent: 'kerbol', atmosphere: { height: 200000, pressure: 202650 }, epochMA: 0.0
+  },
+  priax: {
+    name: 'Priax', type: 'moon', GM: 1.6e9, radius: 74000,
+    SOI: 494582, SMA: 31500000, eccentricity: 0.0, inclination: 2.0,
+    color: '#a0a0a0', parent: 'urlum', atmosphere: null
+  },
+  wal: {
+    name: 'Wal', type: 'moon', GM: 9.31e10, radius: 370000,
+    SOI: 1944910, SMA: 90118820, eccentricity: 0.0, inclination: 1.5,
+    color: '#8090a0', parent: 'urlum', atmosphere: null
+  },
+  tal: {
+    name: 'Tal', type: 'moon', GM: 4.12e7, radius: 22000,
+    SOI: 111452, SMA: 163000000, eccentricity: 0.0, inclination: 13.0,
+    color: '#909090', parent: 'urlum', atmosphere: null
+  },
+  neidon: {
+    name: 'Neidon', type: 'planet', GM: 1.0213e13, radius: 1750000,
+    SOI: 4524965890, SMA: 409355191000, eccentricity: 0.009, inclination: 1.27,
+    color: '#3b81e8', parent: 'kerbol', atmosphere: { height: 260000, pressure: 162120 }, epochMA: 0.0
+  },
+  thatmo: {
+    name: 'Thatmo', type: 'moon', GM: 2.41e10, radius: 270000,
+    SOI: 1000000, SMA: 31500000, eccentricity: 0.0, inclination: 8.0,
+    color: '#90a0b0', parent: 'neidon', atmosphere: { height: 50000, pressure: 40000 }
+  },
+  nissee: {
+    name: 'Nissee', type: 'moon', GM: 1.77e8, radius: 30000,
+    SOI: 192000, SMA: 1264000000, eccentricity: 0.72, inclination: 24.0,
+    color: '#888877', parent: 'neidon', atmosphere: null
+  },
+  plock: {
+    name: 'Plock', type: 'planet', GM: 1.5898e9, radius: 189000,
+    SOI: 179024385, SMA: 535834638714, eccentricity: 0.253, inclination: 6.15,
+    color: '#c4b99a', parent: 'kerbol', atmosphere: null, epochMA: 0.9
+  },
+  karen: {
+    name: 'Karen', type: 'moon', GM: 5.57e8, radius: 85000,
+    SOI: 504000, SMA: 3215000, eccentricity: 0.0, inclination: 0.0,
+    color: '#b0a898', parent: 'plock', atmosphere: null
+  }
+};

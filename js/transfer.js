@@ -6,7 +6,7 @@ function initTransfer() {
 
   ['trn-departure', 'trn-arrival'].forEach(id => {
     populateBodySelect(document.getElementById(id),
-      (key, b) => KERBOL_PLANETS.includes(key), null);
+      (key, b) => b.parent === 'kerbol' && b.type === 'planet', null);
   });
   document.getElementById('trn-departure').value = 'kerbin';
   document.getElementById('trn-arrival').value = 'duna';

@@ -11,6 +11,80 @@
 <body>
 <canvas id="stars-canvas"></canvas>
 
+<!-- ══════ SETTINGS GEAR BUTTON ══════ -->
+<button id="settings-btn" class="settings-btn" title="Settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+</button>
+
+<!-- ══════ SETTINGS PANEL ══════ -->
+<div id="settings-panel" class="settings-panel">
+  <div class="settings-header">
+    <span class="settings-title">MISSION SETTINGS</span>
+    <button class="settings-close" onclick="document.getElementById('settings-panel').classList.remove('open')">✕</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-label">Theme</div>
+    <div class="theme-grid">
+      <button class="theme-btn" data-theme="kerbin">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#090d16 50%,#00d4ff)"></span>Kerbin
+      </button>
+      <button class="theme-btn" data-theme="duna">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#160808 50%,#ff4422)"></span>Duna
+      </button>
+      <button class="theme-btn" data-theme="jool">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#050e05 50%,#44ff88)"></span>Jool
+      </button>
+      <button class="theme-btn" data-theme="kerbol">
+        <span class="theme-swatch" style="background:linear-gradient(135deg,#100800 50%,#ffcc00)"></span>Kerbol
+      </button>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-label">Mods</div>
+    <label class="settings-toggle-row">
+      <span class="settings-toggle-label">Outer Planets Mod</span>
+      <input type="checkbox" id="settings-opm" />
+      <span class="settings-toggle-track"><span class="settings-toggle-thumb"></span></span>
+    </label>
+    <div class="settings-hint">Adds Sarnus, Urlum, Neidon, Plock and their moons to all body selectors.</div>
+  </div>
+
+  <div class="settings-section settings-section-licenses">
+    <div class="settings-section-label">Licenses</div>
+    <div class="license-list">
+      <div class="license-item">
+        <div class="license-name">Three.js r134</div>
+        <div class="license-detail">MIT License — © 2010–2024 three.js authors</div>
+      </div>
+      <div class="license-item">
+        <div class="license-name">Orbitron</div>
+        <div class="license-detail">SIL Open Font License 1.1 — Matt McInerney</div>
+      </div>
+      <div class="license-item">
+        <div class="license-name">Share Tech Mono</div>
+        <div class="license-detail">SIL Open Font License 1.1 — Carrois Type Design</div>
+      </div>
+      <div class="license-item">
+        <div class="license-name">VT323</div>
+        <div class="license-detail">SIL Open Font License 1.1 — Peter Hull</div>
+      </div>
+      <div class="license-item">
+        <div class="license-name">KSP Body Data</div>
+        <div class="license-detail">Values sourced from the KSP Wiki — community maintained</div>
+      </div>
+      <div class="license-item">
+        <div class="license-name">OPM Body Data</div>
+        <div class="license-detail">Outer Planets Mod by CaptRobau &amp; OPM team — MIT License</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="app">
 
   <!-- ══════ MISSION HEADER ══════ -->
@@ -339,6 +413,8 @@
 
 <script src="js/data.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/settings.js"></script>
+<script>preInitSettings();</script>
 <script src="js/viz.js"></script>
 <script src="js/scene3d.js"></script>
 <script src="js/constellation.js"></script>
