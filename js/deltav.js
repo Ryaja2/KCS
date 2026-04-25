@@ -16,13 +16,22 @@ function initDeltaV() {
 function syncAerobrakeVisibility() {
   const destKey = document.getElementById('dv-dest').value;
   const dest = BODIES[destKey];
+  const isStar = dest && dest.type === 'star';
   const hasAtm = !!(dest && dest.atmosphere);
-  const mission = document.getElementById('dv-mission').value;
+  const missionSel = document.getElementById('dv-mission');
+
+  // Hide land/return options for stars
+  missionSel.querySelectorAll('option').forEach(opt => {
+    const isLand = opt.value === 'land' || opt.value === 'land_return';
+    opt.disabled = isStar && isLand;
+    opt.style.display = isStar && isLand ? 'none' : '';
+  });
+  if (isStar && (missionSel.value === 'land' || missionSel.value === 'land_return')) {
+    missionSel.value = 'orbit';
+  }
 
   document.getElementById('dv-aerobrake-dest-row').style.display = hasAtm ? '' : 'none';
-
-  const showLand = mission === 'land' || mission === 'land_return';
-  document.getElementById('dv-dest-orb-row').style.display = mission === 'flyby' ? 'none' : '';
+  document.getElementById('dv-dest-orb-row').style.display = missionSel.value === 'flyby' ? 'none' : '';
 }
 
 function phaseColor(type) {
@@ -61,7 +70,31 @@ function calcMissionDv() {
 
   let transferDv = 0, captureActual = 0;
 
-  if (dest.parent === 'kerbin') {
+  if (destKey === 'kerbol') {
+    // ─ Kerbol solar approach ─
+    const GM_sun = BODIES.kerbol.GM;
+    const r2 = dest.radius + destOrbAlt;
+    const hoh = hohmannDv(GM_sun, kerbin.SMA, r2);
+    const v_inf_dep = Math.abs(hoh.dv1);
+    transferDv = ejectionDv(kerbin.GM, r_lko, v_inf_dep);
+    const captureRaw = Math.abs(hoh.dv2);
+
+    phases.push({
+      label: 'Retrograde Burn → Kerbol',
+      type: 'transfer', dv: transferDv,
+      note: `${formatKSPTime(hoh.transferTime)} transfer — deep solar approach`
+    });
+
+    if (missionType !== 'flyby') {
+      captureActual = captureRaw;
+      phases.push({
+        label: 'Solar Orbit Insertion',
+        type: 'capture', dv: captureActual,
+        note: `${(destOrbAlt / 1000).toFixed(0)} km above Kerbol surface`
+      });
+    }
+
+  } else if (dest.parent === 'kerbin') {
     // ─ Kerbin moon (Mun, Minmus) ─
     const r_moon = dest.SMA;
     const hoh    = hohmannDv(kerbin.GM, r_lko, r_moon);
