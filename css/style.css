@@ -190,7 +190,7 @@ main { flex: 1; padding: 20px; max-width: 1350px; width: 100%; margin: 0 auto; }
   padding: 7px 14px 7px 22px;
   display: flex; align-items: center; gap: 8px;
 }
-.panel-header-text { font-family: var(--f-ui); font-size: 8px; font-weight: 700; letter-spacing: 4px; color: var(--tx-mid); text-transform: uppercase; }
+.panel-header-text { font-family: var(--f-ui); font-size: 8px; font-weight: 700; letter-spacing: 4px; color: var(--tx-mid); text-transform: uppercase; line-height: 1.5; padding-top: 1px; }
 .panel-header-led { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 6px var(--cyan-glow); margin-left: auto; }
 
 .panel-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
@@ -202,7 +202,8 @@ main { flex: 1; padding: 20px; max-width: 1350px; width: 100%; margin: 0 auto; }
   background: linear-gradient(180deg, var(--m2), var(--m1));
   border: 1px solid var(--m3); border-bottom: none;
   border-radius: 3px 3px 0 0;
-  padding: 4px 8px;
+  padding: 6px 8px 4px;
+  line-height: 1.5;
 }
 
 input[type="number"],
@@ -405,7 +406,7 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
 .result-card.ok     { border-color: rgba(42,255,111,0.25); box-shadow: inset 0 1px 4px rgba(0,0,0,0.6), 0 0 8px rgba(42,255,111,0.04); }
 .result-card.warn   { border-color: rgba(255,58,26,0.3);  background: rgba(255,30,10,0.03); }
 
-.result-label { font-family: var(--f-ui); font-size: 7px; letter-spacing: 2px; color: var(--tx-dim); text-transform: uppercase; margin-bottom: 5px; }
+.result-label { font-family: var(--f-ui); font-size: 7px; letter-spacing: 2px; color: var(--tx-dim); text-transform: uppercase; margin-bottom: 5px; line-height: 1.6; padding-top: 2px; }
 .result-value { font-family: var(--f-disp); font-size: 28px; color: var(--amber); text-shadow: 0 0 10px var(--amber-glow); line-height: 1.35; padding-top: 2px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .result-card.ok   .result-value { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
 .result-card.warn .result-value { color: var(--red);   text-shadow: 0 0 10px var(--red-glow); }
@@ -415,6 +416,7 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
   font-family: var(--f-ui); font-size: 8px; letter-spacing: 3px; color: var(--tx-mid);
   text-transform: uppercase; margin-bottom: 8px;
   display: flex; align-items: center; gap: 8px;
+  line-height: 1.5; padding-top: 2px;
 }
 .section-title::after { content: ''; flex: 1; height: 1px; background: var(--m3); }
 
