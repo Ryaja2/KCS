@@ -1,5 +1,30 @@
 // Relay Constellation Calculator
 
+let _syncingConst = false;
+
+function syncConstellationAltPeriod(changedId) {
+  if (_syncingConst) return;
+  _syncingConst = true;
+  const body = BODIES[document.getElementById('con-body').value];
+  if (body) {
+    if (changedId === 'con-period') {
+      const T = parseFloat(document.getElementById('con-period').value);
+      if (!isNaN(T) && T > 0) {
+        const a = Math.cbrt(body.GM * T * T / (4 * Math.PI * Math.PI));
+        const altKm = (a - body.radius) / 1000;
+        if (altKm > 0) document.getElementById('con-altitude').value = altKm.toFixed(2);
+      }
+    } else {
+      const altKm = parseFloat(document.getElementById('con-altitude').value);
+      if (!isNaN(altKm) && altKm > 0) {
+        const T = orbitalPeriod(body.GM, body.radius + altKm * 1000);
+        document.getElementById('con-period').value = Math.round(T);
+      }
+    }
+  }
+  _syncingConst = false;
+}
+
 function initConstellation() {
   const bodySelect = document.getElementById('con-body');
 
@@ -13,11 +38,12 @@ function initConstellation() {
     }
   });
 
-  [bodySelect,
-   document.getElementById('con-numsats'),
-   document.getElementById('con-altitude')
-  ].forEach(el => el.addEventListener('input', calcConstellation));
+  bodySelect.addEventListener('input', () => { syncConstellationAltPeriod('con-altitude'); calcConstellation(); });
+  document.getElementById('con-numsats').addEventListener('input', calcConstellation);
+  document.getElementById('con-altitude').addEventListener('input', () => { syncConstellationAltPeriod('con-altitude'); calcConstellation(); });
+  document.getElementById('con-period').addEventListener('input', () => { syncConstellationAltPeriod('con-period'); calcConstellation(); });
 
+  syncConstellationAltPeriod('con-altitude'); // seed period from default altitude
   calcConstellation();
 }
 
@@ -96,18 +122,17 @@ function calcConstellation() {
       <div class="result-grid">
         <div class="result-card accent">
           <div class="result-label">Resonant Pe Altitude</div>
-          <div class="result-value">${pe_res_alt.toFixed(1)}</div>
-          <div class="result-sub">km — retrograde burn from target alt</div>
+          <div class="result-value" style="font-size:22px">${pe_res_alt.toFixed(1)} km</div>
+          <div class="result-sub">retrograde burn from target alt</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant Ap Altitude</div>
-          <div class="result-value">${ap_res_alt.toFixed(0)}</div>
-          <div class="result-sub">km — equals target altitude</div>
+          <div class="result-value" style="font-size:22px">${ap_res_alt.toFixed(0)} km</div>
+          <div class="result-sub">equals target altitude</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant SMA</div>
-          <div class="result-value">${(a_res/1000).toFixed(1)}</div>
-          <div class="result-sub">km</div>
+          <div class="result-value" style="font-size:22px">${(a_res/1000).toFixed(1)} km</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant Period</div>

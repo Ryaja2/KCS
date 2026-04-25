@@ -57,6 +57,13 @@
               <div class="instrument"><div class="instrument-label">Target Body</div><select id="con-body"></select></div>
               <div class="instrument"><div class="instrument-label">Satellites in Constellation</div><input type="number" id="con-numsats" value="3" min="2" max="24" /></div>
               <div class="instrument"><div class="instrument-label">Target Orbit Altitude (km)</div><input type="number" id="con-altitude" value="1000" min="1" step="10" /></div>
+              <div class="instrument" style="position:relative">
+                <div class="instrument-label" style="display:flex;align-items:center;gap:6px">
+                  Target Orbit Period (s)
+                  <span style="font-size:8px;color:var(--cyan);opacity:0.7;letter-spacing:1px">↔ ALT</span>
+                </div>
+                <input type="number" id="con-period" min="1" step="1" />
+              </div>
             </div>
           </div>
           <div class="panel" style="background:rgba(0,212,255,0.03);border-color:rgba(0,212,255,0.1);padding:10px 14px;font-size:10px;color:var(--tx-mid);line-height:1.6">
