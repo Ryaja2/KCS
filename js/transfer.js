@@ -23,6 +23,15 @@ function initTransfer() {
   calcTransfer();
 }
 
+function readTransferUT() {
+  const y = parseInt(document.getElementById('trn-ut-y').value) || 1;
+  const d = parseInt(document.getElementById('trn-ut-d').value) || 1;
+  const h = parseInt(document.getElementById('trn-ut-h').value) || 0;
+  const m = parseInt(document.getElementById('trn-ut-m').value) || 0;
+  const s = parseInt(document.getElementById('trn-ut-s').value) || 0;
+  return kspUTFromFields(y, d, h, m, s);
+}
+
 function calcTransfer() {
   const depKey   = document.getElementById('trn-departure').value;
   const arrKey   = document.getElementById('trn-arrival').value;
@@ -141,6 +150,8 @@ function calcTransfer() {
   } else {
     drawTransferViz(depKey, arrKey, hoh, r1, r2);
   }
+
+  drawTransferClock(depKey, arrKey, phase, synodic);
 }
 
 function drawTransferViz(depKey, arrKey, hoh, r1, r2) {
@@ -213,4 +224,224 @@ function drawTransferViz(depKey, arrKey, hoh, r1, r2) {
 
   drawLabel(ctx, 8, 20, `${dep.name} → ${arr.name}`, '#7a9fc0', 11, 'left');
   drawLabel(ctx, 8, H - 10, 'Scale: Kerbol system (circular approximation)', '#446680', 10, 'left');
+}
+
+function drawTransferClock(depKey, arrKey, requiredPhaseDeg, synodic) {
+  const canvas = document.getElementById('trn-clock-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const radius = Math.min(W, H) / 2 - 32;
+
+  clearCanvas(ctx, canvas);
+  drawStars(ctx, canvas, 80, 77);
+
+  const dep = BODIES[depKey];
+  const arr = BODIES[arrKey];
+  const GM = BODIES.kerbol.GM;
+  const outward = arr.SMA > dep.SMA;
+
+  // Scaled orbital radii for display (departure innermost when outward)
+  const rMin = Math.min(dep.SMA, arr.SMA);
+  const rMax = Math.max(dep.SMA, arr.SMA);
+  const depR_px = (dep.SMA / rMax) * radius * 0.82;
+  const arrR_px = (arr.SMA / rMax) * radius * 0.82;
+
+  // Radar grid rings
+  [0.3, 0.55, 0.82].forEach(f => {
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * f, 0, 2 * Math.PI);
+    ctx.strokeStyle = 'rgba(0,212,255,0.07)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Tick marks around rim
+  for (let a = 0; a < 360; a += 10) {
+    const ar = (a - 90) * Math.PI / 180;
+    const isMajor = a % 30 === 0;
+    const tickLen = isMajor ? 9 : 5;
+    ctx.beginPath();
+    ctx.moveTo(cx + (radius - tickLen) * Math.cos(ar), cy + (radius - tickLen) * Math.sin(ar));
+    ctx.lineTo(cx + radius * Math.cos(ar), cy + radius * Math.sin(ar));
+    ctx.strokeStyle = isMajor ? 'rgba(0,212,255,0.35)' : 'rgba(0,212,255,0.15)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    if (isMajor) {
+      ctx.fillStyle = 'rgba(0,212,255,0.45)';
+      ctx.font = '8px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const labelR = radius - 18;
+      ctx.fillText(a + '°', cx + labelR * Math.cos(ar), cy + labelR * Math.sin(ar));
+    }
+  }
+
+  // Orbit rings
+  ctx.beginPath();
+  ctx.arc(cx, cy, depR_px, 0, 2 * Math.PI);
+  ctx.strokeStyle = hexToRGBA(dep.color, 0.35);
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, arrR_px, 0, 2 * Math.PI);
+  ctx.strokeStyle = hexToRGBA(arr.color, 0.35);
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Kerbol at center
+  const sunGrd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 12);
+  sunGrd.addColorStop(0, '#ffe87c');
+  sunGrd.addColorStop(0.5, '#FFA500');
+  sunGrd.addColorStop(1, 'transparent');
+  ctx.beginPath();
+  ctx.arc(cx, cy, 12, 0, 2 * Math.PI);
+  ctx.fillStyle = sunGrd;
+  ctx.fill();
+
+  // Get current planet angles from UT
+  const UT = readTransferUT();
+  const depAngleRad = planetAngleAtUT(dep, UT);   // inertial angle of departure
+  const arrAngleRad = planetAngleAtUT(arr, UT);   // inertial angle of arrival
+
+  // Display: fix departure at top (−π/2 in canvas), rotate everything by depAngle offset
+  const rotOffset = -Math.PI / 2 - depAngleRad;
+
+  // Arrival current position display angle
+  const arrDisplayAngle = arrAngleRad + rotOffset;
+
+  // Required arrival position: departure is at -π/2 (top), required is requiredPhaseDeg ahead (CCW = subtract in canvas)
+  const reqArrDisplayAngle = -Math.PI / 2 + (requiredPhaseDeg * Math.PI / 180) * (outward ? 1 : -1);
+
+  // Draw reference line from center to departure (top)
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + depR_px * Math.cos(-Math.PI / 2), cy + depR_px * Math.sin(-Math.PI / 2));
+  ctx.strokeStyle = hexToRGBA(dep.color, 0.25);
+  ctx.lineWidth = 1;
+  ctx.setLineDash([3, 5]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Required arrival position (dashed circle + line)
+  const reqX = cx + arrR_px * Math.cos(reqArrDisplayAngle);
+  const reqY = cy + arrR_px * Math.sin(reqArrDisplayAngle);
+  ctx.save();
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.arc(reqX, reqY, 7, 0, 2 * Math.PI);
+  ctx.strokeStyle = hexToRGBA(arr.color, 0.55);
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
+  drawLabel(ctx, reqX + (reqX > cx ? 10 : -10), reqY + (reqY > cy ? 10 : -12),
+    'target pos', hexToRGBA(arr.color, 0.5), 9, reqX > cx ? 'left' : 'right');
+
+  // Phase arc between current arrival and required (on arrival orbit ring)
+  const arcStart = Math.min(arrDisplayAngle, reqArrDisplayAngle);
+  const arcEnd   = Math.max(arrDisplayAngle, reqArrDisplayAngle);
+  // Draw shorter arc
+  ctx.beginPath();
+  if (arcEnd - arcStart < Math.PI) {
+    ctx.arc(cx, cy, arrR_px, arcStart, arcEnd);
+  } else {
+    ctx.arc(cx, cy, arrR_px, arcEnd, arcStart + 2 * Math.PI);
+  }
+  ctx.strokeStyle = 'rgba(255,179,0,0.5)';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([3, 3]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Departure planet dot (top)
+  const depDispX = cx + depR_px * Math.cos(-Math.PI / 2);
+  const depDispY = cy + depR_px * Math.sin(-Math.PI / 2);
+  drawBody(ctx, depDispX, depDispY, 5, dep.color, dep.color);
+  drawLabel(ctx, depDispX + (depDispX > cx ? 8 : -8), depDispY - 12,
+    dep.name, dep.color, 10, depDispX > cx ? 'left' : 'right');
+
+  // Arrival planet current position
+  const arrDispX = cx + arrR_px * Math.cos(arrDisplayAngle);
+  const arrDispY = cy + arrR_px * Math.sin(arrDisplayAngle);
+  drawBody(ctx, arrDispX, arrDispY, 5, arr.color, arr.color);
+  drawLabel(ctx, arrDispX + (arrDispX > cx ? 8 : -8), arrDispY + (arrDispY > cy ? 12 : -12),
+    arr.name, arr.color, 10, arrDispX > cx ? 'left' : 'right');
+
+  // Current phase angle measurement
+  let currentPhaseDeg = ((arrAngleRad - depAngleRad) * 180 / Math.PI % 360 + 360) % 360;
+  const phaseDiff = (currentPhaseDeg - requiredPhaseDeg + 360) % 360;
+
+  // Time to next window
+  const omega_dep = Math.sqrt(GM / Math.pow(dep.SMA, 3));
+  const omega_arr = Math.sqrt(GM / Math.pow(arr.SMA, 3));
+  const dPhi = omega_arr - omega_dep;  // rad/s
+  let timeToWindow;
+  if (Math.abs(dPhi) < 1e-20) {
+    timeToWindow = 0;
+  } else {
+    const curPhiRad = ((currentPhaseDeg * Math.PI / 180) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+    const reqPhiRad = ((requiredPhaseDeg * Math.PI / 180) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+    let delta;
+    if (dPhi < 0) {
+      // Phase decreasing: wait for curPhi to decrease to reqPhi
+      delta = curPhiRad - reqPhiRad;
+      if (delta < 0) delta += 2 * Math.PI;
+      timeToWindow = delta / Math.abs(dPhi);
+    } else {
+      // Phase increasing: wait for curPhi to increase to reqPhi
+      delta = reqPhiRad - curPhiRad;
+      if (delta < 0) delta += 2 * Math.PI;
+      timeToWindow = delta / dPhi;
+    }
+  }
+
+  // HUD overlay — bottom band
+  ctx.fillStyle = 'rgba(0,8,20,0.65)';
+  ctx.fillRect(0, H - 72, W, 72);
+  ctx.strokeStyle = 'rgba(0,212,255,0.25)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, H - 72);
+  ctx.lineTo(W, H - 72);
+  ctx.stroke();
+
+  const colW = W / 4;
+  const cells = [
+    ['CURRENT PHASE', currentPhaseDeg.toFixed(2) + '°'],
+    ['REQUIRED PHASE', requiredPhaseDeg.toFixed(2) + '°'],
+    ['PHASE ERROR', (phaseDiff > 180 ? phaseDiff - 360 : phaseDiff).toFixed(2) + '°'],
+    ['TIME TO WINDOW', formatKSPTime(timeToWindow)],
+  ];
+
+  cells.forEach(([label, value], i) => {
+    const bx = i * colW + colW / 2;
+    ctx.fillStyle = 'rgba(0,212,255,0.4)';
+    ctx.font = '7px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, bx, H - 56);
+
+    const isError = label === 'PHASE ERROR';
+    const errVal = isError ? parseFloat(value) : 0;
+    ctx.fillStyle = isError
+      ? (Math.abs(errVal) < 5 ? '#00ff88' : Math.abs(errVal) < 20 ? '#ffb300' : '#ff8844')
+      : '#e8f4f8';
+    ctx.font = 'bold 14px "VT323", monospace';
+    ctx.fillText(value, bx, H - 38);
+
+    if (i < 3) {
+      ctx.strokeStyle = 'rgba(0,212,255,0.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo((i + 1) * colW, H - 68);
+      ctx.lineTo((i + 1) * colW, H - 4);
+      ctx.stroke();
+    }
+  });
+
+  // Title
+  drawLabel(ctx, 8, 16, `TRANSFER WINDOW — ${dep.name.toUpperCase()} → ${arr.name.toUpperCase()}`, 'rgba(0,212,255,0.5)', 9, 'left');
+  drawLabel(ctx, W - 8, 16, `UT Y${Math.floor(UT/9203400)+1} D${Math.floor((UT%9203400)/21600)+1}`, 'rgba(0,212,255,0.35)', 9, 'right');
 }

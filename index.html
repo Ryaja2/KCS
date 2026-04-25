@@ -134,12 +134,25 @@
               <div class="instrument"><div class="instrument-label">Target Orbit Alt (km)</div><input type="number" id="trn-arr-alt" value="60" min="1" step="10" /></div>
             </div>
           </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-header-text">Transfer Window Clock</span><span class="panel-header-led" style="background:var(--green);box-shadow:0 0 6px var(--green-glow)"></span></div>
+            <div class="panel-body">
+              <div class="instrument-label">KSP Universal Time</div>
+              <div class="period-inputs" style="grid-template-columns:repeat(5,1fr)">
+                <div class="period-field"><input type="number" id="trn-ut-y" min="1" value="1" /><span class="period-unit">y</span></div>
+                <div class="period-field"><input type="number" id="trn-ut-d" min="1" max="426" value="1" /><span class="period-unit">d</span></div>
+                <div class="period-field"><input type="number" id="trn-ut-h" min="0" max="5" value="0" /><span class="period-unit">h</span></div>
+                <div class="period-field"><input type="number" id="trn-ut-m" min="0" max="59" value="0" /><span class="period-unit">m</span></div>
+                <div class="period-field"><input type="number" id="trn-ut-s" min="0" max="59" value="0" /><span class="period-unit">s</span></div>
+              </div>
+            </div>
+          </div>
           <div class="panel" style="background:rgba(0,212,255,0.03);border-color:rgba(0,212,255,0.1);padding:10px 14px;font-size:10px;color:var(--tx-mid);line-height:1.6">
             <b style="color:var(--cyan)">3D Controls:</b> Drag to rotate · Scroll to zoom
           </div>
         </div>
 
-        <div class="calc-viz">
+        <div class="calc-viz" style="flex-direction:column">
           <div class="mfds-outer">
             <div class="mfds-inner">
               <canvas class="viz-canvas" id="trn-canvas" width="640" height="360"></canvas>
@@ -149,6 +162,18 @@
               <span class="mfds-id">KCS-MFDS-02 · TRANSFER TRAJECTORY · 3D VIEW</span>
               <div class="mfds-sys">
                 <div class="mfds-dot active"></div><div class="mfds-dot off"></div><div class="mfds-dot off"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mfds-outer" style="margin-top:12px">
+            <div class="mfds-inner">
+              <canvas class="viz-canvas" id="trn-clock-canvas" width="640" height="360"></canvas>
+              <div class="mfds-corners"></div>
+            </div>
+            <div class="mfds-statusbar">
+              <span class="mfds-id">KCS-MFDS-02B · TRANSFER WINDOW CLOCK · PHASE DIAGRAM</span>
+              <div class="mfds-sys">
+                <div class="mfds-dot active"></div><div class="mfds-dot active"></div><div class="mfds-dot off"></div>
               </div>
             </div>
           </div>

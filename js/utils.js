@@ -129,3 +129,34 @@ function formatDv(dv) {
 function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, v));
 }
+
+// Solve Kepler's equation M = E - e*sin(E) for eccentric anomaly E
+function solveKepler(M, e, tol = 1e-8) {
+  let E = M;
+  for (let i = 0; i < 100; i++) {
+    const dE = (M - E + e * Math.sin(E)) / (1 - e * Math.cos(E));
+    E += dE;
+    if (Math.abs(dE) < tol) break;
+  }
+  return E;
+}
+
+// True anomaly from mean anomaly and eccentricity
+function trueAnomalyFromMA(M, e) {
+  const Mnorm = ((M % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  const E = solveKepler(Mnorm, e);
+  return 2 * Math.atan2(Math.sqrt(1 + e) * Math.sin(E / 2), Math.sqrt(1 - e) * Math.cos(E / 2));
+}
+
+// Angle (true anomaly) of a solar planet at given KSP UT (seconds from epoch)
+function planetAngleAtUT(body, UT) {
+  if (body.epochMA === undefined) return 0;
+  const T = orbitalPeriod(BODIES.kerbol.GM, body.SMA);
+  const M = body.epochMA + (2 * Math.PI * UT) / T;
+  return trueAnomalyFromMA(M, body.eccentricity || 0);
+}
+
+// KSP UT from Y/D/h/m/s (1-based year and day)
+function kspUTFromFields(y, d, h, m, s) {
+  return (y - 1) * 9203400 + (d - 1) * 21600 + h * 3600 + m * 60 + s;
+}
