@@ -163,8 +163,8 @@ function kspUTFromFields(y, d, h, m, s) {
 
 // Populate a <select> with optgroup-nested body options.
 // filter(key, body) → true to include. defaultKey sets initial value.
-// Planets orbiting Kerbol go in "Kerbol System" group;
-// moons go in "[Planet] System" sub-groups below.
+// Each planet with moons becomes an optgroup (planet first, then moons).
+// Planets without moons and Kerbol are standalone options.
 function populateBodySelect(sel, filter, defaultKey) {
   const moonsByParent = {};
   Object.entries(BODIES).forEach(([key, b]) => {
@@ -174,27 +174,31 @@ function populateBodySelect(sel, filter, defaultKey) {
     }
   });
 
-  const kerbolGroup = document.createElement('optgroup');
-  kerbolGroup.label = 'Kerbol System';
   Object.entries(BODIES).forEach(([key, b]) => {
-    if (!filter(key, b) || b.parent !== 'kerbol') return;
-    const opt = document.createElement('option');
-    opt.value = key; opt.textContent = b.name;
-    kerbolGroup.appendChild(opt);
-  });
-  if (kerbolGroup.children.length) sel.appendChild(kerbolGroup);
+    if (!filter(key, b)) return;
+    // Only process top-level bodies here (star + planets); moons added inside groups
+    if (b.parent && b.parent !== 'kerbol') return;
 
-  Object.entries(BODIES).forEach(([planetKey, planet]) => {
-    const moons = moonsByParent[planetKey];
-    if (!moons || !moons.length) return;
-    const group = document.createElement('optgroup');
-    group.label = `${planet.name} System`;
-    moons.forEach(moonKey => {
+    const moons = moonsByParent[key] || [];
+    if (moons.length) {
+      // Planet with moons → optgroup
+      const group = document.createElement('optgroup');
+      group.label = `${b.name} System`;
+      const planetOpt = document.createElement('option');
+      planetOpt.value = key; planetOpt.textContent = b.name;
+      group.appendChild(planetOpt);
+      moons.forEach(moonKey => {
+        const opt = document.createElement('option');
+        opt.value = moonKey; opt.textContent = BODIES[moonKey].name;
+        group.appendChild(opt);
+      });
+      sel.appendChild(group);
+    } else {
+      // Standalone option (no moons, or Kerbol)
       const opt = document.createElement('option');
-      opt.value = moonKey; opt.textContent = BODIES[moonKey].name;
-      group.appendChild(opt);
-    });
-    sel.appendChild(group);
+      opt.value = key; opt.textContent = b.name;
+      sel.appendChild(opt);
+    }
   });
 
   if (defaultKey) sel.value = defaultKey;

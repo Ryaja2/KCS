@@ -2,7 +2,7 @@
 
 function initDeltaV() {
   const destSel = document.getElementById('dv-dest');
-  populateBodySelect(destSel, (key, b) => key !== 'kerbol', 'mun');
+  populateBodySelect(destSel, () => true, 'mun');
 
   document.querySelectorAll('#tab-deltav input, #tab-deltav select').forEach(el => {
     el.addEventListener('input', () => { syncAerobrakeVisibility(); calcMissionDv(); });

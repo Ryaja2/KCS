@@ -2,7 +2,7 @@
 
 function initOrbit() {
   const bodySelect = document.getElementById('orb-body');
-  populateBodySelect(bodySelect, (key, b) => b.type !== 'star', 'kerbin');
+  populateBodySelect(bodySelect, () => true, 'kerbin');
   document.querySelectorAll('#tab-orbit input, #tab-orbit select').forEach(el => {
     el.addEventListener('input', calcOrbit);
   });
