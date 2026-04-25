@@ -1,13 +1,19 @@
 // Main app controller
 
-const MET_START = Date.now();
+// Persist elapsed time across visits via localStorage
+let _stored = localStorage.getItem('kcs_met_start');
+if (!_stored) {
+  _stored = Date.now().toString();
+  localStorage.setItem('kcs_met_start', _stored);
+}
+const MET_START = parseInt(_stored, 10);
 
 function updateClock() {
   const s  = Math.floor((Date.now() - MET_START) / 1000);
   const ss = String(s % 60).padStart(2, '0');
   const mm = String(Math.floor(s / 60) % 60).padStart(2, '0');
   const hh = String(Math.floor(s / 3600) % 6).padStart(2, '0');
-  const dd = String(Math.floor(s / 21600)).padStart(3, '0');
+  const dd = String(Math.floor(s / 21600)).padStart(2, '0');
   document.getElementById('mission-clock').textContent = `T+ ${dd}:${hh}:${mm}:${ss}`;
 }
 
