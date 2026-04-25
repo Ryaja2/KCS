@@ -60,14 +60,36 @@ function initConstellation() {
     }
   });
 
+  // Relay antenna dropdown (relay-capable antennas + Custom)
+  const relayAntSelect = document.getElementById('con-relay-ant');
+  Object.entries(ANTENNAS).forEach(([name, ant]) => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = ant.relay ? `★ ${name}` : name;
+    if (name === 'RA-15 Relay') opt.selected = true;
+    relayAntSelect.appendChild(opt);
+  });
+
+  // DSN level dropdown
+  const conDsnSelect = document.getElementById('con-dsn');
+  Object.keys(DSN_LEVELS).forEach(name => {
+    const opt = document.createElement('option');
+    opt.value = name;
+    opt.textContent = name;
+    conDsnSelect.appendChild(opt);
+  });
+  conDsnSelect.value = 'Level 3 (250T)';
+
   bodySelect.addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
   document.getElementById('con-numsats').addEventListener('input', calcConstellation);
   document.getElementById('con-altitude').addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
   ['con-period-d','con-period-h','con-period-m','con-period-s'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => { syncConstellationAltPeriod('period'); calcConstellation(); });
   });
+  relayAntSelect.addEventListener('input', calcConstellation);
+  conDsnSelect.addEventListener('input', calcConstellation);
 
-  syncConstellationAltPeriod('alt'); // seed period fields from default altitude
+  syncConstellationAltPeriod('alt');
   calcConstellation();
 }
 
@@ -112,6 +134,29 @@ function calcConstellation() {
   const spacing_km  = (2 * Math.PI * r_target / n) / 1000;
 
   const losColor = losOK ? 'ok' : 'warn';
+
+  // CommNet analysis
+  const relayAntName = document.getElementById('con-relay-ant').value;
+  const relayAnt     = ANTENNAS[relayAntName];
+  const relayPower   = relayAnt && relayAnt.power ? relayAnt.power : 0;
+  const dsnKey       = document.getElementById('con-dsn').value;
+  const dsnPower     = DSN_LEVELS[dsnKey];
+
+  // Inter-satellite chord distance (straight-line between adjacent sats)
+  const chord = 2 * r_target * Math.sin(Math.PI / n);
+  // Relay-relay range with selected antenna: commnetRange(P,P) = P
+  const interSatRange = relayPower ? commnetRange(relayPower, relayPower) : 0;
+  const interSatOK    = interSatRange >= chord;
+
+  // KSC-to-orbit max slant range: when sat is on horizon from ground station
+  // d = sqrt(r_target² - r_body²)
+  const slantRange    = Math.sqrt(r_target * r_target - body.radius * body.radius);
+  const groundRange   = relayPower && dsnPower ? commnetRange(relayPower, dsnPower) : 0;
+  const groundOK      = groundRange >= slantRange;
+
+  // Min power needed for each link
+  const minInterSatPower  = chord;                            // P such that sqrt(P*P) = chord
+  const minGroundPower    = dsnPower ? (slantRange * slantRange) / dsnPower : 0;
 
   const resultsEl = document.getElementById('con-results');
   resultsEl.innerHTML = `
@@ -180,6 +225,30 @@ function calcConstellation() {
         (Pe ${pe_res_alt.toFixed(1)} km / Ap ${ap_res_alt.toFixed(0)} km) →
         after 1 resonant period arrive back at Ap → prograde ${res_entry_dv.toFixed(1)} m/s →
         release sat #2 → repeat ${n} times.
+      </div>
+
+      <div class="section-title" style="margin-top:14px">CommNet Link Analysis</div>
+      <div class="result-grid">
+        <div class="result-card">
+          <div class="result-label">Inter-Sat Distance</div>
+          <div class="result-value">${formatDistance(chord)}</div>
+          <div class="result-sub">chord between adjacent sats</div>
+        </div>
+        <div class="result-card ${interSatOK ? 'ok' : 'warn'}">
+          <div class="result-label">Inter-Sat Link</div>
+          <div class="result-value" style="font-size:18px">${interSatOK ? 'IN RANGE' : 'OUT OF RANGE'}</div>
+          <div class="result-sub">${relayAnt && relayAnt.relay ? '' : '⚠ Not a relay antenna · '}${relayPower ? formatDistance(interSatRange) + ' range' : 'No antenna'} · need ${formatDistance(minInterSatPower)}</div>
+        </div>
+        <div class="result-card">
+          <div class="result-label">KSC Slant Range</div>
+          <div class="result-value">${formatDistance(slantRange)}</div>
+          <div class="result-sub">max dist to horizon sat</div>
+        </div>
+        <div class="result-card ${groundOK ? 'ok' : 'warn'}">
+          <div class="result-label">Ground ↔ Constellation</div>
+          <div class="result-value" style="font-size:18px">${groundOK ? 'COVERED' : 'BELOW RANGE'}</div>
+          <div class="result-sub">${groundRange ? formatDistance(groundRange) + ' range vs DSN ' + dsnKey.split(' ')[0] + ' ' + dsnKey.split(' ')[1] : 'No antenna'} · min power ${formatPower(minGroundPower)}</div>
+        </div>
       </div>
     </div>
   `;

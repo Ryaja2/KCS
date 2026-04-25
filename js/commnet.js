@@ -60,33 +60,34 @@ function calcCommNet() {
   // Direct link range (vessel to DSN)
   const directRange = commnetRange(vesselPower, dsnPower);
 
-  // Via relay (vessel to relay to DSN)
-  const vesselToRelayRange  = commnetRange(vesselPower, relayPower);
-  const relayToDsnRange     = commnetRange(relayPower, dsnPower);
-  const viaSingleRelayRange = Math.min(vesselToRelayRange, relayToDsnRange); // bottleneck
+  // Per-hop ranges
+  const vesselToRelayRange = commnetRange(vesselPower, relayPower);
+  const relayToDsnRange    = commnetRange(relayPower, dsnPower);
+  const relayRelayRange    = commnetRange(relayPower, relayPower);
 
-  // With N relays in chain: weakest link in chain
-  // Optimal relay placement: equidistant
+  // Chain max reach: sum of each hop type at their individual max ranges
+  // Hops: DSN→R1 (relayToDsnRange), R1↔R2↔…↔R(N-1) ((N-1)×relayRelayRange), RN→Vessel (vesselToRelayRange)
   let chainRange = 0;
-  if (numRelays > 0) {
-    // relay-to-relay range
-    const relayRelayRange = commnetRange(relayPower, relayPower);
-    // chain: vessel→relay, (N-1) relay-relay, relay→DSN
-    // effective total path = min of each hop, but hops share the distance
-    // For a straight chain, each hop distance = total / (N+1)
-    chainRange = Infinity; // will compute below
-    chainRange = Math.min(vesselToRelayRange, relayRelayRange) * (numRelays) + Math.min(relayRelayRange, relayToDsnRange);
-    // Better: each segment is a fraction of total
-    // Total range = sum of hop ranges if hops are all equal length
-    // If vessel→relay = Rv, relay-relay = Rr, relay→DSN = Rd
-    // Equidistant optimal: chain spans min(Rv,Rr,Rd) × (N+1)  ...
-    // Actually: chain_span = (N+1) * min(Rv, Rr, Rd)  -- simplified (max span with equal hops)
-    const hopLimiter = Math.min(vesselToRelayRange, commnetRange(relayPower, relayPower), relayToDsnRange);
-    chainRange = hopLimiter * (numRelays + 1);
+  if (numRelays === 1) {
+    chainRange = relayToDsnRange + vesselToRelayRange;
+  } else if (numRelays > 1) {
+    chainRange = relayToDsnRange + (numRelays - 1) * relayRelayRange + vesselToRelayRange;
   }
 
-  const directSignal = signalStrength(distKm, directRange);
-  const relaySignal  = signalStrength(distKm / (numRelays > 0 ? numRelays + 1 : 2), Math.min(vesselToRelayRange, relayToDsnRange));
+  // Signal at given distance
+  const directSignal = distKm > 0 ? signalStrength(distKm, directRange) : -1;
+
+  // Relay chain signal: assume equidistant hops, weakest hop determines signal
+  let chainSignal = -1;
+  if (numRelays > 0 && distKm > 0) {
+    const hopDist = distKm / (numRelays + 1);
+    const hopSignals = [
+      signalStrength(hopDist, relayToDsnRange),
+      ...Array(Math.max(0, numRelays - 1)).fill(0).map(() => signalStrength(hopDist, relayRelayRange)),
+      signalStrength(hopDist, vesselToRelayRange)
+    ];
+    chainSignal = Math.min(...hopSignals);
+  }
 
   function signalBar(s) {
     const pct = (s * 100).toFixed(1);
@@ -144,10 +145,15 @@ function calcCommNet() {
     <div class="section-title" style="margin-top:16px">Signal at ${formatDistance(distKm)}</div>
     <div class="result-grid">
       <div class="result-card${directSignal > 0 ? ' ok' : ' warn'}">
-        <div class="result-label">Direct Link</div>
-        ${signalBar(directSignal)}
-        <div class="result-sub">${directSignal > 0 ? 'Connected' : 'Out of range'}</div>
+        <div class="result-label">Direct Link (Vessel ↔ DSN)</div>
+        ${signalBar(Math.max(0, directSignal))}
+        <div class="result-sub">${directSignal > 0 ? 'Connected' : 'Out of range — max ' + formatDistance(directRange)}</div>
       </div>
+      ${numRelays > 0 ? `<div class="result-card${chainSignal > 0 ? ' ok' : ' warn'}">
+        <div class="result-label">Relay Chain (${numRelays} relay${numRelays > 1 ? 's' : ''}, equidistant)</div>
+        ${signalBar(Math.max(0, chainSignal))}
+        <div class="result-sub">${chainSignal > 0 ? 'Connected — weakest hop limits signal' : 'Out of range — chain max ' + formatDistance(chainRange)}</div>
+      </div>` : ''}
     </div>` : ''}
     <div class="info-box" style="margin-top:16px">
       <b>KSP CommNet:</b> Range = √(P₁ × P₂). Signal strength is approximately (1 − d/R)².

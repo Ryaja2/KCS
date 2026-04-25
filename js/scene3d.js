@@ -21,8 +21,10 @@ function addStarfield(scene, count = 2500) {
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.4, sizeAttenuation: true, transparent: true, opacity: 0.65 });
-  scene.add(new THREE.Points(geo, mat));
+  const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.4, sizeAttenuation: true, transparent: true, opacity: 0.65, depthWrite: false, depthTest: false });
+  const pts = new THREE.Points(geo, mat);
+  pts.renderOrder = 0;
+  scene.add(pts);
 }
 
 // Ellipse with planet at one focus.
@@ -30,44 +32,69 @@ function addStarfield(scene, count = 2500) {
 function makeEllipse(pe, ap, segs = 128, color = 0x00d4ff, opacity = 0.85) {
   const a = (pe + ap) / 2;
   const b = Math.sqrt(pe * ap);
-  const c = (ap - pe) / 2; // center offset from focus
+  const c = (ap - pe) / 2;
   const pts = [];
   for (let i = 0; i <= segs; i++) {
     const t = (i / segs) * Math.PI * 2;
     pts.push(new THREE.Vector3(-c + a * Math.cos(t), 0, b * Math.sin(t)));
   }
   const geo = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat = new THREE.LineBasicMaterial({ color, transparent: true, opacity });
-  return new THREE.LineLoop(geo, mat);
+  const mat = new THREE.LineBasicMaterial(_mat({ color, transparent: true, opacity }));
+  const mesh = new THREE.LineLoop(geo, mat);
+  mesh.renderOrder = 3;
+  return mesh;
 }
 
 function makeCircle(r, segs = 128, color = 0x00d4ff, opacity = 0.8) {
   return makeEllipse(r, r, segs, color, opacity);
 }
 
+// Render order layers (pure painter's algorithm, all depthTest:false depthWrite:false)
+// 1 = planet glow, 2 = planet wireframe, 3 = orbit lines, 4 = atmosphere, 5 = dots/arrows
+
+function _mat(opts) {
+  return Object.assign({ depthTest: false, depthWrite: false }, opts);
+}
+
 function makeSphere(radius, color, wireOpacity = 0.22, segments = 18) {
   const geo = new THREE.SphereGeometry(radius, segments, Math.ceil(segments * 0.7));
-  const mat = new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: wireOpacity });
-  return new THREE.Mesh(geo, mat);
+  const mat = new THREE.MeshBasicMaterial(_mat({ color, wireframe: true, transparent: true, opacity: wireOpacity }));
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = 2;
+  return mesh;
 }
 
 function makeSolidSphere(radius, color, opacity = 0.08) {
   const geo = new THREE.SphereGeometry(radius, 16, 10);
-  const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity, side: THREE.BackSide });
-  return new THREE.Mesh(geo, mat);
+  const mat = new THREE.MeshBasicMaterial(_mat({ color, transparent: true, opacity, side: THREE.BackSide }));
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = 1;
+  return mesh;
 }
 
 function makeDot(radius, color) {
   const geo = new THREE.SphereGeometry(radius, 8, 6);
-  const mat = new THREE.MeshBasicMaterial({ color });
-  return new THREE.Mesh(geo, mat);
+  const mat = new THREE.MeshBasicMaterial(_mat({ color }));
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = 5;
+  return mesh;
+}
+
+function makeAtmosphere(radius, color, opacity = 0.22) {
+  const geo = new THREE.SphereGeometry(radius, 32, 20);
+  const mat = new THREE.MeshBasicMaterial(_mat({ color, transparent: true, opacity }));
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.renderOrder = 4;
+  return mesh;
 }
 
 function makeArrow(from, to, color) {
   const pts = [new THREE.Vector3(...from), new THREE.Vector3(...to)];
   const geo = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat = new THREE.LineBasicMaterial({ color });
-  return new THREE.Line(geo, mat);
+  const mat = new THREE.LineBasicMaterial(_mat({ color }));
+  const mesh = new THREE.Line(geo, mat);
+  mesh.renderOrder = 5;
+  return mesh;
 }
 
 // ── scene factory ──────────────────────────────────────────
@@ -186,6 +213,7 @@ function updateConst3D({ bodyKey, n, alt, minAlt, a_res, pe_res, ap_res, losOK }
   if (body.atmosphere) {
     const atmR = (body.radius + body.atmosphere.height) * scale;
     sc.add(makeSolidSphere(atmR, pColor, 0.04));
+    sc.add(makeAtmosphere(atmR, pColor));
   }
 
   // Minimum LOS orbit (faint red ring)
@@ -238,8 +266,10 @@ function updateConst3D({ bodyKey, n, alt, minAlt, a_res, pe_res, ap_res, losOK }
     const b = satPositions[(i + 1) % n];
     const pts = [new THREE.Vector3(...a), new THREE.Vector3(...b)];
     const geo = new THREE.BufferGeometry().setFromPoints(pts);
-    const mat = new THREE.LineBasicMaterial({ color: losColor, transparent: true, opacity: 0.35 });
-    sc.add(new THREE.Line(geo, mat));
+    const mat = new THREE.LineBasicMaterial(_mat({ color: losColor, transparent: true, opacity: 0.35 }));
+    const l = new THREE.Line(geo, mat);
+    l.renderOrder = 3;
+    sc.add(l);
   }
 
   // Resize grid ring
@@ -283,6 +313,7 @@ function updateOrbit3D({ bodyKey, peAlt, apAlt }) {
   if (body.atmosphere) {
     const atmW = (body.radius + body.atmosphere.height) * scale;
     sc.add(makeSolidSphere(atmW, pColor, 0.04));
+    sc.add(makeAtmosphere(atmW, pColor));
   }
 
   // Equatorial grid
@@ -398,7 +429,9 @@ function updateMission3D({ destKey, lkoAlt }) {
     sc.add(makeSphere(r_world, kColor, 0.22));
     sc.add(makeSolidSphere(r_world * 1.03, kColor, 0.07));
     if (kerbin.atmosphere) {
-      sc.add(makeSolidSphere((kerbin.radius + kerbin.atmosphere.height) * scale, kColor, 0.04));
+      const atmW = (kerbin.radius + kerbin.atmosphere.height) * scale;
+      sc.add(makeSolidSphere(atmW, kColor, 0.04));
+      sc.add(makeAtmosphere(atmW, kColor));
     }
 
     // LKO ring (faint)
@@ -531,8 +564,10 @@ function updateCommNet3D({ directRange, v2r, r2d, numRelays, chainRange, dist })
   const lineColor = inDirectRange ? 0x2aff6f : 0x224455;
   const pts = [new THREE.Vector3(kscX, 0, 0), new THREE.Vector3(vesWorldX, 0, 0)];
   const geo  = new THREE.BufferGeometry().setFromPoints(pts);
-  const mat  = new THREE.LineBasicMaterial({ color: lineColor, transparent: true, opacity: inDirectRange ? 0.8 : 0.3 });
-  sc.add(new THREE.Line(geo, mat));
+  const mat  = new THREE.LineBasicMaterial(_mat({ color: lineColor, transparent: true, opacity: inDirectRange ? 0.8 : 0.3 }));
+  const dl = new THREE.Line(geo, mat);
+  dl.renderOrder = 3;
+  sc.add(dl);
 
   // Relay chain
   if (numRelays > 0) {
@@ -559,8 +594,10 @@ function updateCommNet3D({ directRange, v2r, r2d, numRelays, chainRange, dist })
       cPts.push(new THREE.Vector3(x, 0, 0));
     }
     const cGeo = new THREE.BufferGeometry().setFromPoints(cPts);
-    const cMat = new THREE.LineBasicMaterial({ color: 0xffb300, transparent: true, opacity: 0.6 });
-    sc.add(new THREE.Line(cGeo, cMat));
+    const cMat = new THREE.LineBasicMaterial(_mat({ color: 0xffb300, transparent: true, opacity: 0.6 }));
+    const cl = new THREE.Line(cGeo, cMat);
+    cl.renderOrder = 3;
+    sc.add(cl);
   }
 
   // Distance marker vertical line
