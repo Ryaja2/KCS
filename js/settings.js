@@ -1,4 +1,4 @@
-// Settings panel
+// Settings
 
 const SETTINGS_KEY = 'kcs_settings';
 
@@ -15,7 +15,7 @@ function applyTheme(theme) {
   document.body.setAttribute('data-theme', theme || 'kerbin');
 }
 
-// Call before DOMContentLoaded init so selects are built with correct bodies
+// Run before DOMContentLoaded so BODIES has OPM data when selects are built
 function preInitSettings() {
   const s = loadSettings();
   applyTheme(s.theme || 'kerbin');
@@ -24,20 +24,6 @@ function preInitSettings() {
 
 function initSettings() {
   const s = loadSettings();
-
-  const panel = document.getElementById('settings-panel');
-  const btn   = document.getElementById('settings-btn');
-
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    panel.classList.toggle('open');
-  });
-
-  document.addEventListener('click', e => {
-    if (!panel.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-      panel.classList.remove('open');
-    }
-  });
 
   // Theme buttons
   document.querySelectorAll('.theme-btn').forEach(b => {
@@ -63,7 +49,8 @@ function initSettings() {
       Object.keys(OPM_BODIES).forEach(k => delete BODIES[k]);
     }
     rebuildBodySelects();
+    // Re-run active tab's calculator
     const active = document.querySelector('.ctrl-btn.active');
-    if (active) active.click();
+    if (active && active.dataset.tab !== 'settings') active.click();
   });
 }

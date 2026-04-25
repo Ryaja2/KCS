@@ -32,6 +32,10 @@
   --f-ui:   'Orbitron', sans-serif;
   --f-body: 'Share Tech Mono', monospace;
 
+  --bg-base:   #040609;
+  --bg-grad-a: #07101c;
+  --bg-grad-b: #060e18;
+
   /* Bezel colors — Orion/Shuttle MFDS style */
   --bz:      #1c2130;
   --bz-hi:   #2c3548;
@@ -43,12 +47,12 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
   height: 100%;
-  background-color: #040609;
+  background-color: var(--bg-base);
   background-image:
     repeating-linear-gradient(0deg,   rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 36px),
     repeating-linear-gradient(90deg,  rgba(255,255,255,0.014) 0px, rgba(255,255,255,0.014) 1px, transparent 1px, transparent 36px),
     repeating-linear-gradient(135deg, rgba(255,255,255,0.004) 0px, rgba(255,255,255,0.004) 1px, transparent 1px, transparent 5px),
-    linear-gradient(160deg, #07101c 0%, #040609 45%, #060e18 100%);
+    linear-gradient(160deg, var(--bg-grad-a) 0%, var(--bg-base) 45%, var(--bg-grad-b) 100%);
   color: var(--tx); font-family: var(--f-body); font-size: 14px; overflow-x: hidden;
 }
 
@@ -578,7 +582,7 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
   nav.control-panel-nav {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px; padding: 0;
+    gap: 4px; padding: 0; width: 100%;
   }
   .ctrl-btn {
     padding: 10px 4px;
@@ -638,60 +642,18 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
 }
 
 /* ═══════════════════════════════════════════════════════
-   SETTINGS GEAR BUTTON
+   SETTINGS TAB
 ═══════════════════════════════════════════════════════ */
-.settings-btn {
-  position: fixed; top: 14px; right: 16px; z-index: 400;
-  width: 34px; height: 34px;
-  background: var(--m2); border: 1px solid var(--m5); border-radius: 4px;
-  color: var(--tx-mid); cursor: pointer;
-  display: flex; align-items: center; justify-content: center; padding: 7px;
-  transition: color .15s, border-color .15s, box-shadow .15s, transform .2s;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+.settings-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
 }
-.settings-btn:hover { color: var(--amber); border-color: var(--amber); box-shadow: 0 0 10px var(--amber-glow); }
-.settings-btn svg { width: 100%; height: 100%; }
-.settings-panel.open ~ #app .settings-btn,
-.settings-btn.panel-open { transform: rotate(45deg); }
-
-/* ═══════════════════════════════════════════════════════
-   SETTINGS PANEL
-═══════════════════════════════════════════════════════ */
-.settings-panel {
-  position: fixed; top: 0; right: 0;
-  width: 300px; height: 100vh;
-  background: linear-gradient(160deg, var(--m3) 0%, var(--m1) 100%);
-  border-left: 1px solid var(--m5);
-  box-shadow: -6px 0 32px rgba(0,0,0,0.85);
-  z-index: 350;
-  transform: translateX(100%);
-  transition: transform .28s cubic-bezier(.4,0,.2,1);
-  overflow-y: auto; display: flex; flex-direction: column;
-}
-.settings-panel.open { transform: translateX(0); }
-
-.settings-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--m4);
-  background: var(--m2);
-  position: sticky; top: 0; z-index: 10;
-}
-.settings-title {
-  font-family: var(--f-ui); font-size: 9px; font-weight: 700;
-  letter-spacing: 4px; color: var(--amber); text-shadow: 0 0 12px var(--amber-glow);
-  line-height: 1.5; padding-top: 2px;
-}
-.settings-close {
-  background: none; border: none; color: var(--tx-mid);
-  font-size: 16px; cursor: pointer; padding: 2px 6px; line-height: 1;
-  transition: color .15s; border-radius: 3px;
-}
-.settings-close:hover { color: var(--red); }
+@media (max-width: 768px) { .settings-layout { grid-template-columns: 1fr; } }
 
 .settings-section {
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--m3);
+  display: flex; flex-direction: column; gap: 10px;
 }
 .settings-section-label {
   font-family: var(--f-ui); font-size: 7px; font-weight: 700;
@@ -773,6 +735,7 @@ body[data-theme="duna"] {
   --green-glow: rgba(255,170,68,0.55);
   --m0: #0d0402; --m1: #160806; --m2: #1e0e0a;
   --m3: #2a1610; --m4: #381e16; --m5: #4a2820; --m6: #5e3428;
+  --bg-base: #0a0302; --bg-grad-a: #160806; --bg-grad-b: #0e0504;
 }
 
 /* ── Jool (acid green) ── */
@@ -787,6 +750,7 @@ body[data-theme="jool"] {
   --green-glow: rgba(204,255,68,0.55);
   --m0: #030803; --m1: #060e06; --m2: #0a150a;
   --m3: #101e10; --m4: #162816; --m5: #1e3620; --m6: #284428;
+  --bg-base: #020602; --bg-grad-a: #050f05; --bg-grad-b: #040804;
 }
 
 /* ── Kerbol (solar orange) ── */
@@ -801,4 +765,5 @@ body[data-theme="kerbol"] {
   --green-glow: rgba(255,238,68,0.55);
   --m0: #060400; --m1: #0e0800; --m2: #180e00;
   --m3: #221400; --m4: #2e1c00; --m5: #3c2800; --m6: #4e3800;
+  --bg-base: #050300; --bg-grad-a: #0e0900; --bg-grad-b: #070500;
 }

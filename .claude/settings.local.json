@@ -14,7 +14,10 @@
       "Bash(git pull *)",
       "Bash(git stash *)",
       "Bash(git commit -m 'feat: retro-futuristic control panel redesign + fix resonant orbit Pe/Ap *)",
-      "Bash(git commit -m 'feat: 3D wireframe displays, MFDS bezels, mission ΔV planner *)"
+      "Bash(git commit -m 'feat: 3D wireframe displays, MFDS bezels, mission ΔV planner *)",
+      "Bash(cat .github/workflows/*.yml)",
+      "Bash(cat _config.yml)",
+      "Bash(gh run *)"
     ]
   }
 }
