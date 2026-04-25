@@ -12,7 +12,7 @@ function saveSettings(s) {
 }
 
 function applyTheme(theme) {
-  document.body.setAttribute('data-theme', theme || 'kerbin');
+  document.documentElement.setAttribute('data-theme', theme || 'kerbin');
 }
 
 // Run before DOMContentLoaded so BODIES has OPM data when selects are built

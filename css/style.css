@@ -724,7 +724,7 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
 ═══════════════════════════════════════════════════════ */
 
 /* ── Duna (rust/red) ── */
-body[data-theme="duna"] {
+:root[data-theme="duna"] {
   --amber:      #ff7733;
   --amber-glow: rgba(255,119,51,0.6);
   --amber-wide: rgba(255,119,51,0.12);
@@ -739,7 +739,7 @@ body[data-theme="duna"] {
 }
 
 /* ── Jool (acid green) ── */
-body[data-theme="jool"] {
+:root[data-theme="jool"] {
   --amber:      #88ff44;
   --amber-glow: rgba(136,255,68,0.6);
   --amber-wide: rgba(136,255,68,0.12);
@@ -754,7 +754,7 @@ body[data-theme="jool"] {
 }
 
 /* ── Kerbol (solar orange) ── */
-body[data-theme="kerbol"] {
+:root[data-theme="kerbol"] {
   --amber:      #ffcc00;
   --amber-glow: rgba(255,204,0,0.6);
   --amber-wide: rgba(255,204,0,0.12);
