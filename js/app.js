@@ -1,25 +1,5 @@
 // Main app controller
 
-(function checkWebGL() {
-  try {
-    const c = document.createElement('canvas');
-    if (window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl'))) return;
-  } catch(e) {}
-  // No WebGL — show persistent banner
-  const banner = document.createElement('div');
-  banner.id = 'webgl-warn';
-  banner.innerHTML = '&#9888; WebGL not available &mdash; 3D displays disabled. Enable hardware acceleration in browser settings (Settings &rarr; Advanced &rarr; Use hardware acceleration).';
-  banner.style.cssText = [
-    'position:fixed','top:0','left:0','right:0','z-index:9999',
-    'background:linear-gradient(90deg,#1a0500,#0a0000,#1a0500)',
-    'border-bottom:1px solid #ff3a1a',
-    'color:#ff8060','font-family:\'Orbitron\',monospace','font-size:9px',
-    'letter-spacing:2px','padding:7px 20px','text-align:center',
-    'text-shadow:0 0 8px rgba(255,58,26,0.6)'
-  ].join(';');
-  document.addEventListener('DOMContentLoaded', () => document.body.prepend(banner));
-})();
-
 const MET_START = Date.now();
 
 function updateClock() {

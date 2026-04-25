@@ -81,7 +81,16 @@ function getOrCreateScene(canvasId, camPos = [0, 2, 6]) {
   const W = canvas.clientWidth  || canvas.width  || 640;
   const H = canvas.clientHeight || canvas.height || 360;
 
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  } catch(e) {
+    canvas.parentElement.insertAdjacentHTML('beforeend',
+      '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
+      'font-family:Orbitron,monospace;font-size:9px;letter-spacing:2px;color:#ff6040;' +
+      'background:#010308;z-index:30">&#9888; WEBGL UNAVAILABLE</div>');
+    return null;
+  }
   renderer.setSize(W, H, false);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x010308, 1);

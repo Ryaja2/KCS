@@ -313,23 +313,7 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
     inset -1px 0 0 rgba(0,0,0,0.3);
 }
 
-/* L-bracket corner alignment marks */
-.mfds-outer::before {
-  content: '';
-  position: absolute;
-  inset: 18px 18px 22px;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 0/20px 2px no-repeat,
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 0/2px 20px no-repeat,
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 0/20px 2px no-repeat,
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 0/2px 20px no-repeat,
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 100%/20px 2px no-repeat,
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 100%/2px 20px no-repeat,
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 100%/20px 2px no-repeat,
-    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 100%/2px 20px no-repeat;
-  z-index: 1;
-}
+/* removed — L-brackets moved to .mfds-corners inside .mfds-inner */
 
 /* Inner bezel recess lip — thin dark ring before the glass */
 .mfds-inner {
@@ -369,6 +353,23 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
 }
 
 .viz-canvas { display: block; width: 100%; background: #010308; border-radius: 3px; }
+
+/* L-bracket corner marks — inside the display glass, above scanlines */
+.mfds-corners {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 22;
+  background:
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 0/18px 2px no-repeat,
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 0/2px 18px no-repeat,
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 0/18px 2px no-repeat,
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 0/2px 18px no-repeat,
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 100%/18px 2px no-repeat,
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 0 100%/2px 18px no-repeat,
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 100%/18px 2px no-repeat,
+    linear-gradient(var(--bz-brkt),var(--bz-brkt)) 100% 100%/2px 18px no-repeat;
+}
 
 /* Status strip at bottom of mount */
 .mfds-statusbar {
