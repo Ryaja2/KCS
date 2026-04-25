@@ -57,12 +57,17 @@
               <div class="instrument"><div class="instrument-label">Target Body</div><select id="con-body"></select></div>
               <div class="instrument"><div class="instrument-label">Satellites in Constellation</div><input type="number" id="con-numsats" value="3" min="2" max="24" /></div>
               <div class="instrument"><div class="instrument-label">Target Orbit Altitude (km)</div><input type="number" id="con-altitude" value="1000" min="1" step="10" /></div>
-              <div class="instrument" style="position:relative">
+              <div class="instrument">
                 <div class="instrument-label" style="display:flex;align-items:center;gap:6px">
-                  Target Orbit Period (s)
+                  Target Orbit Period (KSP)
                   <span style="font-size:8px;color:var(--cyan);opacity:0.7;letter-spacing:1px">↔ ALT</span>
                 </div>
-                <input type="number" id="con-period" min="1" step="1" />
+                <div class="period-inputs">
+                  <div class="period-field"><input type="number" id="con-period-d" min="0" value="0" /><span class="period-unit">d</span></div>
+                  <div class="period-field"><input type="number" id="con-period-h" min="0" max="5" value="0" /><span class="period-unit">h</span></div>
+                  <div class="period-field"><input type="number" id="con-period-m" min="0" max="59" value="0" /><span class="period-unit">m</span></div>
+                  <div class="period-field"><input type="number" id="con-period-s" min="0" max="59" value="0" /><span class="period-unit">s</span></div>
+                </div>
               </div>
             </div>
           </div>

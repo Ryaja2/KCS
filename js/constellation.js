@@ -2,14 +2,37 @@
 
 let _syncingConst = false;
 
+const KERBIN_DAY = 21600; // seconds per Kerbin day (6 hours)
+
+function periodToFields(T) {
+  const d = Math.floor(T / KERBIN_DAY);
+  const rem1 = T % KERBIN_DAY;
+  const h = Math.floor(rem1 / 3600);
+  const rem2 = rem1 % 3600;
+  const m = Math.floor(rem2 / 60);
+  const s = Math.round(rem2 % 60);
+  document.getElementById('con-period-d').value = d;
+  document.getElementById('con-period-h').value = h;
+  document.getElementById('con-period-m').value = m;
+  document.getElementById('con-period-s').value = s;
+}
+
+function fieldsToSeconds() {
+  const d = parseFloat(document.getElementById('con-period-d').value) || 0;
+  const h = parseFloat(document.getElementById('con-period-h').value) || 0;
+  const m = parseFloat(document.getElementById('con-period-m').value) || 0;
+  const s = parseFloat(document.getElementById('con-period-s').value) || 0;
+  return d * KERBIN_DAY + h * 3600 + m * 60 + s;
+}
+
 function syncConstellationAltPeriod(changedId) {
   if (_syncingConst) return;
   _syncingConst = true;
   const body = BODIES[document.getElementById('con-body').value];
   if (body) {
-    if (changedId === 'con-period') {
-      const T = parseFloat(document.getElementById('con-period').value);
-      if (!isNaN(T) && T > 0) {
+    if (changedId === 'period') {
+      const T = fieldsToSeconds();
+      if (T > 0) {
         const a = Math.cbrt(body.GM * T * T / (4 * Math.PI * Math.PI));
         const altKm = (a - body.radius) / 1000;
         if (altKm > 0) document.getElementById('con-altitude').value = altKm.toFixed(2);
@@ -17,8 +40,7 @@ function syncConstellationAltPeriod(changedId) {
     } else {
       const altKm = parseFloat(document.getElementById('con-altitude').value);
       if (!isNaN(altKm) && altKm > 0) {
-        const T = orbitalPeriod(body.GM, body.radius + altKm * 1000);
-        document.getElementById('con-period').value = Math.round(T);
+        periodToFields(orbitalPeriod(body.GM, body.radius + altKm * 1000));
       }
     }
   }
@@ -38,12 +60,14 @@ function initConstellation() {
     }
   });
 
-  bodySelect.addEventListener('input', () => { syncConstellationAltPeriod('con-altitude'); calcConstellation(); });
+  bodySelect.addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
   document.getElementById('con-numsats').addEventListener('input', calcConstellation);
-  document.getElementById('con-altitude').addEventListener('input', () => { syncConstellationAltPeriod('con-altitude'); calcConstellation(); });
-  document.getElementById('con-period').addEventListener('input', () => { syncConstellationAltPeriod('con-period'); calcConstellation(); });
+  document.getElementById('con-altitude').addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
+  ['con-period-d','con-period-h','con-period-m','con-period-s'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => { syncConstellationAltPeriod('period'); calcConstellation(); });
+  });
 
-  syncConstellationAltPeriod('con-altitude'); // seed period from default altitude
+  syncConstellationAltPeriod('alt'); // seed period fields from default altitude
   calcConstellation();
 }
 
