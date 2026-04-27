@@ -110,6 +110,10 @@ const DSN_LEVELS = {
 // Planet bodies that orbit Kerbol (for transfer calculator)
 const KERBOL_PLANETS = ['moho','eve','kerbin','duna','dres','jool','eeloo'];
 
+// OPM moves Eeloo from Kerbol orbit to Sarnus moon — store both states
+const STOCK_EELOO_ORBIT = { parent: 'kerbol', type: 'planet', SMA: 90118820000, eccentricity: 0.26, inclination: 6.15 };
+const OPM_EELOO_ORBIT   = { parent: 'sarnus',  type: 'moon',   SMA: 19105978,    eccentricity: 0.0034, inclination: 2.3 };
+
 // Outer Planets Mod bodies — merged into BODIES when OPM is enabled
 const OPM_BODIES = {
   sarnus: {

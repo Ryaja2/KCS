@@ -19,7 +19,7 @@ function applyTheme(theme) {
 function preInitSettings() {
   const s = loadSettings();
   applyTheme(s.theme || 'kerbin');
-  if (s.opm) Object.assign(BODIES, OPM_BODIES);
+  if (s.opm) { Object.assign(BODIES, OPM_BODIES); Object.assign(BODIES.eeloo, OPM_EELOO_ORBIT); }
 }
 
 function initSettings() {
@@ -45,8 +45,10 @@ function initSettings() {
     saveSettings(cur);
     if (cur.opm) {
       Object.assign(BODIES, OPM_BODIES);
+      Object.assign(BODIES.eeloo, OPM_EELOO_ORBIT);
     } else {
       Object.keys(OPM_BODIES).forEach(k => delete BODIES[k]);
+      Object.assign(BODIES.eeloo, STOCK_EELOO_ORBIT);
     }
     rebuildBodySelects();
     // Re-run active tab's calculator
