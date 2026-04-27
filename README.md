@@ -2,14 +2,13 @@
 
 **Live app:** https://ryaja2.github.io/KCS/
 
-A browser-based orbital mechanics and mission planning toolkit for **Kerbal Space Program**. No install, no account — runs entirely client-side.
-
+A browser-based orbital mechanics and mission planning toolkit for **Kerbal Space Program**.
 ---
 
 ## Calculators
 
-### Constellation Designer
-Design satellite constellations in KSP. Set the body, number of satellites, and target altitude. Get the exact orbital period needed for even spacing, plus the parking-orbit period to use during deployment.
+### Constellation Calculator
+Calculate orbital parameters and resonant orbits for CommNet constellations.
 
 ### Hohmann Transfer Planner
 Calculate Δv and travel time for Hohmann transfers between any two bodies in the Kerbol system. Enter a KSP universal time (UT) to see the current phase angle vs. the required angle, and a live countdown to the next optimal launch window — visualized on a radar-style phase clock.
@@ -29,14 +28,11 @@ Calculate communication link strength between any two antenna types, accounting 
 
 - **Multiple themes** — Kerbin, Duna, Jool, Kerbol
 - **Outer Planets Mod (OPM) support** — toggle in Settings to add Sarnus, Urlum, Neidon, Plock, and all their moons
-- **Mission clock** — tracks time since your first visit, persists across sessions
-- **Retro CRT aesthetic** — scanlines, phosphor glow, nixie-style readouts
-
 ---
 
 ## Usage
 
-Open [https://ryaja2.github.io/KCS/](https://ryaja2.github.io/KCS/) in any modern browser. No download required.
+Open [https://ryaja2.github.io/KCS/](https://ryaja2.github.io/KCS/)
 
 To run locally: clone the repo and open `index.html` — no build step or server needed.
 
