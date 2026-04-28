@@ -189,7 +189,7 @@ function calcConstellation() {
         <div class="result-card ${losColor}">
           <div class="result-label">Line-of-Sight</div>
           <div class="result-value">${losOK ? 'CLEAR' : 'BLOCKED'}</div>
-          <div class="result-sub">Min safe alt: ${(minAlt/1000).toFixed(3)} km</div>
+          <div class="result-sub">Min safe alt: ${minAlt.toFixed(0)} m</div>
         </div>
         <div class="result-card">
           <div class="result-label">Orbital Period</div>
@@ -211,17 +211,17 @@ function calcConstellation() {
       <div class="result-grid">
         <div class="result-card accent">
           <div class="result-label">Resonant Pe Altitude</div>
-          <div class="result-value" style="font-size:22px">${pe_res_alt.toFixed(3)} km</div>
+          <div class="result-value" style="font-size:22px">${(pe_res_alt * 1000).toFixed(0)} m</div>
           <div class="result-sub">${resType === 'outer' ? 'equals target altitude' : 'below target — carrier drops here'}</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant Ap Altitude</div>
-          <div class="result-value" style="font-size:22px">${ap_res_alt.toFixed(3)} km</div>
+          <div class="result-value" style="font-size:22px">${(ap_res_alt * 1000).toFixed(0)} m</div>
           <div class="result-sub">${resType === 'outer' ? 'above target — carrier rises here' : 'equals target altitude'}</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant SMA</div>
-          <div class="result-value" style="font-size:22px">${(a_res/1000).toFixed(3)} km</div>
+          <div class="result-value" style="font-size:22px">${a_res.toFixed(0)} m</div>
         </div>
         <div class="result-card accent">
           <div class="result-label">Resonant Period</div>
