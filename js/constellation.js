@@ -70,7 +70,7 @@ function initConstellation() {
     opt.textContent = name;
     conDsnSelect.appendChild(opt);
   });
-  conDsnSelect.value = 'Level 3 (250T)';
+  conDsnSelect.value = 'Level 1 (2G)';
 
   bodySelect.addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
   document.getElementById('con-resonant-type').addEventListener('input', calcConstellation);

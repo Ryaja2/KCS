@@ -102,9 +102,9 @@ const ANTENNAS = {
 };
 
 const DSN_LEVELS = {
-  'Level 1 (2T)':   2e12,
-  'Level 2 (50T)':  5e13,
-  'Level 3 (250T)': 2.5e14
+  'Level 1 (2G)':   2e9,
+  'Level 2 (50G)':  5e10,
+  'Level 3 (250G)': 2.5e11
 };
 
 // Planet bodies that orbit Kerbol (for transfer calculator)

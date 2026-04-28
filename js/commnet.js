@@ -22,7 +22,7 @@ function initCommNet() {
     opt.textContent = name;
     dsnSelect.appendChild(opt);
   });
-  dsnSelect.value = 'Level 3 (250T)';
+  dsnSelect.value = 'Level 1 (2G)';
 
   document.querySelectorAll('#tab-commnet input, #tab-commnet select').forEach(el => {
     el.addEventListener('input', calcCommNet);
