@@ -72,9 +72,18 @@ function initConstellation() {
   });
   conDsnSelect.value = 'Level 1 (2G)';
 
-  bodySelect.addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
+  function setMinAltitude() {
+    const body = BODIES[document.getElementById('con-body').value];
+    const n    = parseInt(document.getElementById('con-numsats').value);
+    if (!body || isNaN(n) || n < 2) return;
+    const minKm = minConstellationAltitude(body.radius, n) / 1000;
+    document.getElementById('con-altitude').value = minKm.toFixed(2);
+    syncConstellationAltPeriod('alt');
+  }
+
+  bodySelect.addEventListener('input', () => { setMinAltitude(); calcConstellation(); });
   document.getElementById('con-resonant-type').addEventListener('input', calcConstellation);
-  document.getElementById('con-numsats').addEventListener('input', calcConstellation);
+  document.getElementById('con-numsats').addEventListener('input', () => { setMinAltitude(); calcConstellation(); });
   document.getElementById('con-altitude').addEventListener('input', () => { syncConstellationAltPeriod('alt'); calcConstellation(); });
   ['con-period-d','con-period-h','con-period-m','con-period-s'].forEach(id => {
     document.getElementById(id).addEventListener('input', () => { syncConstellationAltPeriod('period'); calcConstellation(); });
@@ -82,7 +91,7 @@ function initConstellation() {
   relayAntSelect.addEventListener('input', calcConstellation);
   conDsnSelect.addEventListener('input', calcConstellation);
 
-  syncConstellationAltPeriod('alt');
+  setMinAltitude();
   calcConstellation();
 }
 
