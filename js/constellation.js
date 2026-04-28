@@ -275,8 +275,8 @@ function calcConstellation() {
             const gr  = relayPower ? commnetRange(relayPower, p) : 0;
             const ok  = gr >= slantRange;
             const sel = name === dsnKey;
-            const ratio = gr > 0 ? Math.min(slantRange / gr, 1) : 1;
-            const pct   = gr > 0 ? Math.max(0, Math.pow(1 - ratio, 2) * 100) : 0;
+            const V   = gr > 0 ? Math.max(0, Math.min(1, 1 - slantRange / gr)) : 0;
+            const pct = (3 - 2 * V) * V * V * 100;
             const barColor = pct > 60 ? 'var(--green)' : pct > 25 ? 'var(--amber)' : 'var(--red)';
             return `<tr class="${sel ? 'dsn-row-sel' : ''}">
               <td>${name}${sel ? ' ◀' : ''}</td>
