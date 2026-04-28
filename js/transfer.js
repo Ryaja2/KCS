@@ -200,15 +200,14 @@ function drawTransferViz(depKey, arrKey, hoh, r1, r2) {
   ctx.setLineDash([]);
   ctx.restore();
 
-  // Departure point (periapsis of transfer if outward)
-  const depAngle = Math.PI; // left side = periapsis (outward: closer to sun)
-  const depPx_x = outward ? cx - r1px : cx + r1px;
+  // Departure at periapsis (outward) or apoapsis (inward) — always rightmost point of ellipse
+  const depPx_x = cx + r1px;
   const depPx_y = cy;
 
   drawBody(ctx, depPx_x, depPx_y, 5, dep.color, null);
 
-  // Arrival point
-  const arrPx_x = outward ? cx + r2px : cx - r2px;
+  // Arrival at apoapsis (outward) or periapsis (inward) — always leftmost point
+  const arrPx_x = cx - r2px;
   const arrPx_y = cy;
   drawBody(ctx, arrPx_x, arrPx_y, 5, arr.color, null);
 
@@ -307,7 +306,7 @@ function drawTransferClock(depKey, arrKey, requiredPhaseDeg, synodic) {
   const arrDisplayAngle = arrAngleRad + rotOffset;
 
   // Required arrival position: departure is at -π/2 (top), required is requiredPhaseDeg ahead (CCW = subtract in canvas)
-  const reqArrDisplayAngle = -Math.PI / 2 + (requiredPhaseDeg * Math.PI / 180) * (outward ? 1 : -1);
+  const reqArrDisplayAngle = -Math.PI / 2 + (requiredPhaseDeg * Math.PI / 180);
 
   // Draw reference line from center to departure (top)
   ctx.beginPath();

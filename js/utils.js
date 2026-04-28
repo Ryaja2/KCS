@@ -77,16 +77,11 @@ function commnetRange(p1, p2) {
   return Math.sqrt(p1 * p2);
 }
 
-// CommNet signal strength (KSP1 formula: signal = 1 - (d/maxR)^(log0.5/log(relPow)))
-// Simplified: KSP uses exponent based on rangeModifier, default results in
-// signal = (1 - d/R) with some curve. Using simple linear for display.
+// CommNet signal strength — KSP smoothstep: V = 1 - d/R, strength = (3 - 2V) * V^2
 function signalStrength(distance, maxRange) {
   if (distance >= maxRange) return 0;
-  const ratio = distance / maxRange;
-  // KSP1 uses a curve: strength = (1 - ratio) clamped, but displayed non-linearly
-  // Exact formula: exponent = Math.log(0.5) / Math.log(baseSignal) where baseSignal depends on range setting
-  // For simplicity use quadratic approximation matching KSP behavior
-  return Math.max(0, 1 - ratio * ratio);
+  const V = Math.max(0, 1 - distance / maxRange);
+  return (3 - 2 * V) * V * V;
 }
 
 // Format seconds to KSP time (6h days, 426-day years)
