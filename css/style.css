@@ -529,6 +529,14 @@ input[type="checkbox"] { accent-color: var(--cyan); width: 14px; height: 14px; c
 .dsn-table td:first-child { font-family: var(--f-ui); font-size: 8px; letter-spacing: 1px; color: var(--tx-dim); }
 .dsn-row-sel td { color: var(--amber) !important; background: rgba(255,179,0,0.04); }
 .dsn-row-sel td:first-child { color: var(--amber) !important; }
+.sig-bar-wrap {
+  display: inline-block; vertical-align: middle;
+  width: 72px; height: 8px;
+  background: var(--m3); border: 1px solid var(--m4); border-radius: 2px;
+  overflow: hidden; margin-right: 5px;
+}
+.sig-bar-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+.sig-bar-pct { font-family: var(--f-body); font-size: 11px; vertical-align: middle; }
 
 /* ═══════════════════════════════════════════════════════
    RESPONSIVE

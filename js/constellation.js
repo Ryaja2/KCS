@@ -269,15 +269,24 @@ function calcConstellation() {
         </div>
       </div>
       <table class="dsn-table" style="margin-top:8px">
-        <thead><tr><th>DSN Level</th><th>Ground Range</th><th>Covers KSC?</th></tr></thead>
+        <thead><tr><th>DSN Level</th><th>Ground Range</th><th>Signal Strength</th><th>Covers KSC?</th></tr></thead>
         <tbody>
           ${Object.entries(DSN_LEVELS).map(([name, p]) => {
             const gr  = relayPower ? commnetRange(relayPower, p) : 0;
             const ok  = gr >= slantRange;
             const sel = name === dsnKey;
+            const ratio = gr > 0 ? Math.min(slantRange / gr, 1) : 1;
+            const pct   = gr > 0 ? Math.max(0, Math.pow(1 - ratio, 2) * 100) : 0;
+            const barColor = pct > 60 ? 'var(--green)' : pct > 25 ? 'var(--amber)' : 'var(--red)';
             return `<tr class="${sel ? 'dsn-row-sel' : ''}">
               <td>${name}${sel ? ' ◀' : ''}</td>
               <td>${gr ? formatDistance(gr) : '—'}</td>
+              <td>
+                <div class="sig-bar-wrap">
+                  <div class="sig-bar-fill" style="width:${pct.toFixed(1)}%;background:${barColor};box-shadow:0 0 4px ${barColor}"></div>
+                </div>
+                <span class="sig-bar-pct" style="color:${barColor}">${pct.toFixed(1)}%</span>
+              </td>
               <td style="color:${ok ? 'var(--green)' : 'var(--red)'}">${ok ? 'YES' : 'NO'}</td>
             </tr>`;
           }).join('')}
