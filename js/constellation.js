@@ -123,7 +123,7 @@ function calcConstellation() {
   //   a = r_target × (N/(N-1))^(2/3),  Ap = 2a − r_target
   let a_res, ap_res, pe_res, ap_res_alt, pe_res_alt;
   if (resType === 'outer') {
-    a_res       = r_target * Math.pow(n / (n - 1), 2/3);
+    a_res       = r_target * Math.pow((n + 1) / n, 2/3);
     pe_res      = r_target;
     ap_res      = 2 * a_res - pe_res;
     pe_res_alt  = altKm;
@@ -226,7 +226,7 @@ function calcConstellation() {
         <div class="result-card accent">
           <div class="result-label">Resonant Period</div>
           <div class="result-value">${formatKSPTime(T_res)}</div>
-          <div class="result-sub">${resType === 'outer' ? `${n}/${n-1} × target` : `${n-1}/${n} × target`}</div>
+          <div class="result-sub">${resType === 'outer' ? `${n+1}/${n} × target` : `${n-1}/${n} × target`}</div>
         </div>
         <div class="result-card ok">
           <div class="result-label">Entry ΔV (per release)</div>
