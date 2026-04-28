@@ -231,20 +231,6 @@ function calcConstellation() {
         </div>
       </div>
 
-      <div class="info-box">
-        ${resType === 'outer'
-          ? `<b>Deploy sequence (outer):</b> Circularize at ${altKm.toFixed(0)} km → release sat #1 →
-             prograde ${res_entry_dv.toFixed(1)} m/s to enter resonant orbit
-             (Pe ${pe_res_alt.toFixed(1)} km / Ap ${ap_res_alt.toFixed(1)} km) →
-             after 1 resonant period arrive back at Pe → retrograde ${res_entry_dv.toFixed(1)} m/s to circularize →
-             release sat #2 → repeat ${n} times.`
-          : `<b>Deploy sequence (inner):</b> Circularize at ${altKm.toFixed(0)} km → release sat #1 →
-             retrograde ${res_entry_dv.toFixed(1)} m/s to enter resonant orbit
-             (Pe ${pe_res_alt.toFixed(1)} km / Ap ${ap_res_alt.toFixed(1)} km) →
-             after 1 resonant period arrive back at Ap → prograde ${res_entry_dv.toFixed(1)} m/s to circularize →
-             release sat #2 → repeat ${n} times.`}
-      </div>
-
       <div class="section-title" style="margin-top:14px">CommNet Link Analysis</div>
       <div class="result-grid">
         <div class="result-card">

@@ -95,9 +95,9 @@ const ANTENNAS = {
   'Communotron DTS-M1':{ power: 2e9,   relay: false, combinable: true  },
   'Communotron HG-55': { power: 1.5e10, relay: false, combinable: false },
   'Communotron 88-88': { power: 1e11,  relay: false, combinable: false },
-  'RA-2 Relay':        { power: 2e12,  relay: true,  combinable: false },
-  'RA-15 Relay':       { power: 1.5e13, relay: true,  combinable: false },
-  'RA-100 Relay':      { power: 1e14,  relay: true,  combinable: false },
+  'RA-2 Relay':        { power: 2e9,   relay: true,  combinable: false },
+  'RA-15 Relay':       { power: 1.5e10, relay: true,  combinable: false },
+  'RA-100 Relay':      { power: 1e11,  relay: true,  combinable: false },
   'Custom':            { power: null,  relay: false, combinable: false }
 };
 

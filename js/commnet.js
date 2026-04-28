@@ -168,7 +168,7 @@ function calcCommNet() {
       </div>` : ''}
     </div>` : ''}
     <div class="info-box" style="margin-top:16px">
-      <b>KSP CommNet:</b> Range = √(P₁ × P₂). Signal strength is approximately (1 − d/R)².
+      <b>KSP CommNet:</b> Range = √(P₁ × P₂). Signal strength = (3 − 2V)·V² where V = 1 − d/R (smoothstep).
       Combinability multiplies antenna powers within a vessel.
       Relay antennas can forward signals; probe cores require direct or relay path to KSC.
     </div>

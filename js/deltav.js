@@ -19,23 +19,23 @@ function syncAerobrakeVisibility() {
   const isStar = dest && dest.type === 'star';
   const hasAtm = !!(dest && dest.atmosphere);
   const missionSel = document.getElementById('dv-mission');
+  const isFlyby = missionSel.value === 'flyby';
+  const doReturn = document.getElementById('dv-return').checked;
 
-  // Hide land/return options for stars
+  // Hide land option for stars
   missionSel.querySelectorAll('option').forEach(opt => {
-    const isLand = opt.value === 'land' || opt.value === 'land_return';
+    const isLand = opt.value === 'land';
     opt.disabled = isStar && isLand;
     opt.style.display = isStar && isLand ? 'none' : '';
   });
-  if (isStar && (missionSel.value === 'land' || missionSel.value === 'land_return')) {
-    missionSel.value = 'orbit';
-  }
+  if (isStar && missionSel.value === 'land') missionSel.value = 'orbit';
 
-  if (isStar) {
-    document.getElementById('dv-dest-orb').value = 610;  // minimum safe orbit above Kerbol
-  }
+  if (isStar) document.getElementById('dv-dest-orb').value = 610;
 
+  document.getElementById('dv-return-row').style.display         = isFlyby ? 'none' : '';
   document.getElementById('dv-aerobrake-dest-row').style.display = hasAtm ? '' : 'none';
-  document.getElementById('dv-dest-orb-row').style.display = missionSel.value === 'flyby' ? 'none' : '';
+  document.getElementById('dv-aerobrake-kerbin-row').style.display = (!isFlyby && doReturn) ? '' : 'none';
+  document.getElementById('dv-dest-orb-row').style.display       = isFlyby ? 'none' : '';
 }
 
 function phaseColor(type) {
@@ -50,6 +50,7 @@ function calcMissionDv() {
   const aerobrakeD    = document.getElementById('dv-aerobrake-dest').checked && !!(BODIES[destKey]?.atmosphere);
   const aerobrakeK    = document.getElementById('dv-aerobrake-kerbin').checked;
   const inclLaunch    = document.getElementById('dv-include-launch').checked;
+  const doReturn      = document.getElementById('dv-return').checked && missionType !== 'flyby';
 
   const dest   = BODIES[destKey];
   const kerbin = BODIES.kerbin;
@@ -193,7 +194,7 @@ function calcMissionDv() {
   }
 
   // ── LANDING ────────────────────────────────────────────
-  const doLand = missionType === 'land' || missionType === 'land_return';
+  const doLand = missionType === 'land';
   if (doLand) {
     const v_surf = circularVelocity(dest.GM, dest.radius);
     let landDv;
@@ -210,7 +211,6 @@ function calcMissionDv() {
   }
 
   // ── ASCENT ─────────────────────────────────────────────
-  const doReturn = missionType === 'land_return';
   if (doReturn && doLand) {
     const v_orb = circularVelocity(dest.GM, r_dest_orb);
     let gravDrag = 150, dragLoss = 0;
@@ -226,7 +226,7 @@ function calcMissionDv() {
   }
 
   // ── RETURN ─────────────────────────────────────────────
-  if (missionType === 'orbit' || missionType === 'land_return') {
+  if (doReturn) {
     // Return departure ≈ same as capture (time-reversal symmetry)
     phases.push({
       label: `Return Burn → Kerbin`,

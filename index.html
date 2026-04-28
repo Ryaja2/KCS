@@ -198,9 +198,8 @@
               <div class="instrument"><div class="instrument-label">Mission Type</div>
                 <select id="dv-mission">
                   <option value="flyby">Flyby</option>
-                  <option value="orbit">Orbit</option>
-                  <option value="land">Land (one way)</option>
-                  <option value="land_return" selected>Land + Return</option>
+                  <option value="orbit" selected>Orbit</option>
+                  <option value="land">Land</option>
                 </select>
               </div>
               <div class="instrument"><div class="instrument-label">LKO Altitude (km)</div><input type="number" id="dv-lko-alt" value="80" min="0" /></div>
@@ -211,8 +210,9 @@
             <div class="panel-header"><span class="panel-header-text">Options</span><span class="panel-header-led"></span></div>
             <div class="panel-body">
               <div class="toggle-row"><label class="toggle-label"><input type="checkbox" id="dv-include-launch" checked />Include Kerbin Launch</label></div>
+              <div class="toggle-row" id="dv-return-row"><label class="toggle-label"><input type="checkbox" id="dv-return" checked />Include Return</label></div>
               <div class="toggle-row" id="dv-aerobrake-dest-row"><label class="toggle-label"><input type="checkbox" id="dv-aerobrake-dest" checked />Aerobrake at Destination</label></div>
-              <div class="toggle-row"><label class="toggle-label"><input type="checkbox" id="dv-aerobrake-kerbin" checked />Aerobrake at Kerbin Return</label></div>
+              <div class="toggle-row" id="dv-aerobrake-kerbin-row"><label class="toggle-label"><input type="checkbox" id="dv-aerobrake-kerbin" checked />Aerobrake at Kerbin Return</label></div>
             </div>
           </div>
         </div>
